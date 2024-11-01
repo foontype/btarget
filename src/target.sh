@@ -3,7 +3,8 @@
 trap '[[ ${?} -eq 0 ]] && _bootstrap "${@}"' EXIT
 
 TARGETS_DIR=${TARGETS_DIR:-.}
-TARGET_SHELL=${TARGET_SHELL:-run.sh}
+TARGET_SHELL=${TARGET_SHELL:-target.sh}
+TARGET_RUN_SHELL=${TARGET_RUN_SHELL:-run.sh}
 
 _usage() {
     local error="${1}"
@@ -13,7 +14,7 @@ _usage() {
     if [ "${#run_targets[@]}" -gt 0 ]; then
         echo ""
         echo "Available run targets:"
-        for t in ${run_targets}; do
+        for t in ${run_targets[*]}; do
             echo "  * ${t}"
             example_target="${t}"
         done
@@ -37,7 +38,10 @@ _usage() {
 }
 
 _list_run_targets() {
-    for t in $(compgen -G ${TARGETS_DIR}/*/${TARGET_SHELL}); do
+    for t in $(compgen -G "${TARGETS_DIR}/*/${TARGET_SHELL}"); do
+        echo $(basename $(dirname ${t}))
+    done
+    for t in $(compgen -G "${TARGETS_DIR}/*/${TARGET_RUN_SHELL}"); do
         echo $(basename $(dirname ${t}))
     done
 }
@@ -61,11 +65,17 @@ _run_target() {
     local run_target="${1}"
     local run_target_dir="${TARGETS_DIR}/${run_target}"
     local run_target_shell="./${TARGET_SHELL}"
+    local run_target_run_shell="./${TARGET_RUN_SHELL}"
 
     shift
 
     cd "${run_target_dir}"
     echo "(in $(pwd))"
+
+    if [ ! -f "${run_target_shell}" ]; then
+        run_target_shell="${run_target_run_shell}"
+    fi
+
     ${run_target_shell} "${@}"
 }
 
