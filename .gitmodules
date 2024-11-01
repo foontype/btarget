@@ -1,0 +1,3 @@
+[submodule "examples/bask-target-example/supports/bask"]
+	path = examples/bask-target-example/supports/bask
+	url = https://github.com/jez/bask
