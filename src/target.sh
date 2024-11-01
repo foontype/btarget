@@ -12,10 +12,15 @@ _usage() {
     local run_targets=($(_list_run_targets))
 
     if [ "${#run_targets[@]}" -gt 0 ]; then
+        local max_length=$(_max_len "${run_targets[@]}")
+
         echo ""
         echo "Available run targets:"
         for t in ${run_targets[*]}; do
-            echo "  * ${t}"
+            local about=$(_get_about "${t}")
+            [ -z "${about}" ] \
+                && echo " * ${t}" \
+                || printf " * %-${max_length}s  ... %s\n" "${t}" "${about}"
             example_target="${t}"
         done
 
@@ -77,6 +82,29 @@ _run_target() {
     fi
 
     ${run_target_shell} "${@}"
+}
+
+_get_about() {
+    local run_target="${1}"
+    local about_file="./${run_target}/ABOUT"
+
+    if [ -f "${about_file}" ]; then
+        cat "${about_file}" | head -n 1
+    fi
+}
+
+_max_len() {
+    local arr=("${@}")
+    local max_length=0
+
+    for item in "${arr[@]}"; do
+        length=${#item}
+        if (( length > max_length )); then
+            max_length=$length
+        fi
+    done
+
+    echo "${max_length}"
 }
 
 _bootstrap() {
