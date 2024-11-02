@@ -10,7 +10,8 @@ services:
         - http_proxy
         - https_proxy
         - no_proxy
+    environment:
+      - SHUNIT2=/usr/bin/shunit2
     command: sleep infinity
     volumes:
       - ../..:/workspace
-

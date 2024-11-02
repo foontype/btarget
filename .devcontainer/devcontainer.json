@@ -7,6 +7,8 @@
 	"customizations": {
 		"vscode": {
 			"settings": {
+				"workbench.iconTheme": "material-icon-theme",
+				"workbench.tree.indent": 20,
 				"explorer.compactFolders": false,
 				"terminal.integrated.defaultProfile.linux": "bash",
 				"terminal.integrated.profiles.linux": {
@@ -17,6 +19,7 @@
 				}
 			},
 			"extensions": [
+				"PKief.material-icon-theme",
 				"bierner.markdown-mermaid",
 				"corschenzi.mermaid-graphical-editor",
 				"ms-azuretools.vscode-docker",

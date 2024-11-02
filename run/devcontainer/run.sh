@@ -2,7 +2,7 @@
 set -e
 cd $(dirname "${0}")
 
-source ../../examples/bask-target-example/supports/bask/src/bask.sh
+source ../supports/bask/src/bask.sh
 
 bask_default_task="usage"
 

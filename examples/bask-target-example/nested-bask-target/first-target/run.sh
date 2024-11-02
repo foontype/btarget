@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e
-source ../../supports/bask/src/bask.sh
+source ../../../../run/supports/bask/src/bask.sh
 
 bask_default_task="usage"
 
