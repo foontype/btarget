@@ -5,6 +5,7 @@ trap '[[ ${?} -eq 0 ]] && _bootstrap "${@}"' EXIT
 TARGETS_DIR=${TARGETS_DIR:-.}
 TARGET_SHELL=${TARGET_SHELL:-target.sh}
 TARGET_RUN_SHELL=${TARGET_RUN_SHELL:-run.sh}
+TARGET_DESC_FILENAME=${TARGET_DESC_FILENAME:-TARGETDESC}
 
 _usage() {
     local error="${1}"
@@ -89,10 +90,10 @@ _run_target() {
 
 _get_desc() {
     local run_target="${1}"
-    local desc_file="./${run_target}/TARGETDESC"
+    local desc_path="./${run_target}/${TARGET_DESC_FILENAME}"
 
-    if [ -f "${desc_file}" ]; then
-        cat "${desc_file}" | head -n 1
+    if [ -f "${desc_path}" ]; then
+        cat "${desc_path}" | head -n 1
     fi
 }
 
