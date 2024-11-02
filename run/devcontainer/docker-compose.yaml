@@ -1,0 +1,16 @@
+services:
+  workspace:
+    build:
+      context: ../..
+      dockerfile: ./run/containers/workspace/Dockerfile
+      args:
+        - HTTP_PROXY
+        - HTTPS_PROXY
+        - NO_PROXY
+        - http_proxy
+        - https_proxy
+        - no_proxy
+    command: sleep infinity
+    volumes:
+      - ../..:/workspace
+
