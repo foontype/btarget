@@ -11,6 +11,7 @@ services:
         - https_proxy
         - no_proxy
     environment:
+      - WORKSPACE_ROOT=/workspace
       - SHUNIT2=/usr/bin/shunit2
     command: sleep infinity
     volumes:
