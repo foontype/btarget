@@ -17,19 +17,22 @@ _usage() {
         echo ""
         echo "Available run targets:"
         for t in ${run_targets[*]}; do
-            local about=$(_get_about "${t}")
-            [ -z "${about}" ] \
+            local desc=$(_get_desc "${t}")
+            [ -z "${desc}" ] \
                 && echo " * ${t}" \
-                || printf " * %-${max_length}s  ... %s\n" "${t}" "${about}"
+                || printf " * %-${max_length}s   # %s\n" "${t}" "${desc}"
             example_target="${t}"
         done
 
         echo ""
         echo "Usage:"
         echo "  ${0} <run target>"
-
         echo ""
         echo "  ex) ${0} ${example_target}"
+
+        echo ""
+        echo "  run target can be abbreviated at each slash."
+        echo "  for instance, \"th-i-ap\" matches \"this-is-apple\"."
         echo ""
     else
         error="no run target found."
@@ -84,12 +87,12 @@ _run_target() {
     ${run_target_shell} "${@}"
 }
 
-_get_about() {
+_get_desc() {
     local run_target="${1}"
-    local about_file="./${run_target}/ABOUT"
+    local desc_file="./${run_target}/TARGETDESC"
 
-    if [ -f "${about_file}" ]; then
-        cat "${about_file}" | head -n 1
+    if [ -f "${desc_file}" ]; then
+        cat "${desc_file}" | head -n 1
     fi
 }
 
