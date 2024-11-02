@@ -4,6 +4,9 @@ services:
       context: ../..
       dockerfile: ./run/containers/workspace/Dockerfile
       args:
+        - CONTAINER_USER
+        - CONTAINER_UID
+        - CONTAINER_GID
         - HTTP_PROXY
         - HTTPS_PROXY
         - NO_PROXY
