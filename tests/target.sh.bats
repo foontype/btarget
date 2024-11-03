@@ -1,12 +1,15 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bats
 
 source ${WORKSPACE_ROOT}/src/target.sh
 trap - EXIT
 
-test_max_len() {
-    local strings=("a" "bc" "def" "g" "hi" "jk")
-    local result=$(_max_len "${strings[@]}")
-    assertEquals "${result}" "3"
+@test "TARGETS_DIR" {
+    [ "${TARGETS_DIR}" = "." ]
 }
 
-source ${SHUNIT2}
+@test "_max_len" {
+    local strings=("a" "bc" "def" "g" "hi" "jk")
+    local result=$(_max_len "${strings[@]}")
+
+    [ "$result" = "3" ]
+}

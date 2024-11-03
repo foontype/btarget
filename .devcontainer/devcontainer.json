@@ -19,6 +19,7 @@
 				}
 			},
 			"extensions": [
+				"jetmartin.bats",
 				"PKief.material-icon-theme",
 				"bierner.markdown-mermaid",
 				"corschenzi.mermaid-graphical-editor",

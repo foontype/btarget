@@ -4,12 +4,15 @@ ARG CONTAINER_USER=${CONTAINER_USER:-nonroot:nonroot}
 ARG CONTAINER_UID=${CONTAINER_UID:-1000}
 ARG CONTAINER_GID=${CONTAINER_GID:-1000}
 
+WORKDIR /workspace
+
 RUN apt-get update \
  && apt-get install -y \
 	sudo \
 	git \
 	curl \
-	shunit2
+	shunit2 \
+	bats
 
 RUN deluser ubuntu
 RUN addgroup --gid ${CONTAINER_GID} nonroot \

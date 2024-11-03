@@ -9,3 +9,7 @@ bask_default_task="usage"
 task_usage() {
     bask_list_tasks
 }
+
+task_test() {
+    docker compose exec workspace bats ./tests/
+}
