@@ -36,7 +36,7 @@ _usage() {
         echo "  for instance, \"th-i-ap\" matches \"this-is-apple\"."
         echo ""
     else
-        error="no run target found."
+        error="no run targets found."
     fi
 
     if [ -n "${error}" ]; then
