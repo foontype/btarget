@@ -12,7 +12,7 @@ task_usage() {
 
 task_test() {
     cd ../..
-    bats --show-output-of-passing-tests --print-output-on-failure --pretty ./tests
+    bats --print-output-on-failure --pretty ./tests
 }
 
 task_tap() {

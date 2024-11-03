@@ -65,3 +65,26 @@ fgh" ]
     run _make_select_pattern "!ab"
     [ "${output}" = "" ]
 }
+
+@test "_select_run_targets" {
+    local expects=(
+        '"a-z" "" no-match.'
+        '"a" "abc" match by simple abbreviation.'
+        '"b-c-d" "bcd-cde-def" match by slash abbreviation.'
+        '"b-c" "bcd-cde
+bcd-cde-def" multiple match.'
+    )
+
+    _list_run_targets() {
+        echo "abc
+bcd-cde
+bcd-cde-def"
+    }
+
+    for x in "${expects[@]}"; do
+        echo "running ... ${x}"
+        eval "set ${x}"
+        run _select_run_targets "${1}"
+        [ "${output}" = "${2:-}" ]
+    done
+}
