@@ -12,5 +12,5 @@ task_usage() {
 
 task_test() {
     cd ../..
-    bats --show-output-of-passing-tests ./tests
+    bats --show-output-of-passing-tests --print-output-on-failure ./tests
 }

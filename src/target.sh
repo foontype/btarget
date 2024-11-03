@@ -10,7 +10,7 @@ TARGET_DESC_FILENAME=${TARGET_DESC_FILENAME:-TARGETDESC}
 _usage() {
     local error="${1}"
     local example_target="run-target"
-    local run_targets=($(_list_run_targets))
+    local run_targets=($(_list_sorted_run_targets))
 
     if [ "${#run_targets[@]}" -gt 0 ]; then
         local max_length=$(_max_len "${run_targets[@]}")
@@ -53,6 +53,10 @@ _list_run_targets() {
     for t in $(compgen -G "${TARGETS_DIR}/*/${TARGET_RUN_SHELL}"); do
         echo $(basename $(dirname ${t}))
     done
+}
+
+_list_sorted_run_targets() {
+    _list_run_targets | sort
 }
 
 _select_run_targets() {
