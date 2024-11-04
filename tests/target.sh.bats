@@ -36,6 +36,7 @@ abc" ]
 @test "_list_run_targets_with_env" {
     _list_run_targets() {
         echo "on-x
+on-x-a
 bcd
 cde
 on-y"
@@ -45,7 +46,8 @@ on-y"
 
     run _list_run_targets_with_env
 
-    [ "${output}" = "on-x" ]
+    [ "${output}" = "on-x
+on-x-a" ]
 }
 
 @test "_list_run_targets_with_env_by_sort" {
