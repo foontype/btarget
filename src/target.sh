@@ -6,11 +6,12 @@ TARGETS_DIR=${TARGETS_DIR:-.}
 TARGET_SHELL=${TARGET_SHELL:-target.sh}
 TARGET_RUN_SHELL=${TARGET_RUN_SHELL:-run.sh}
 TARGET_DESC_FILENAME=${TARGET_DESC_FILENAME:-TARGETDESC}
+TARGET_ENV=${TARGET_ENV:-}
 
 _usage() {
     local error="${1}"
     local example_target="run-target"
-    local run_targets=($(_list_sorted_run_targets))
+    local run_targets=($(_list_run_targets_with_env))
 
     if [ "${#run_targets[@]}" -gt 0 ]; then
         local max_length=$(_max_len "${run_targets[@]}")
@@ -55,13 +56,12 @@ _list_run_targets() {
     done
 }
 
-_list_sorted_run_targets() {
-    _list_run_targets | sort
-}
-
-_select_run_targets() {
-    local input="${1}"
-    local pattern=$(_make_select_pattern "${input}")
+_list_run_targets_with_env() {
+    local env=$(echo "${TARGET_ENV}" | grep '^[a-z-][a-z-]*$')
+    local pattern="*"
+    if [ -n "${env}" ]; then
+        pattern="*-on-${env}"
+    fi
 
     for t in $(_list_run_targets); do
         if [[ "${t}" == ${pattern} ]]; then
@@ -70,8 +70,26 @@ _select_run_targets() {
     done
 }
 
+_list_run_targets_with_env_by_sort() {
+    _list_run_targets_with_env | sort
+}
+
+_select_run_targets() {
+    local input=$(echo "${1}" | grep '^[a-z-][a-z-]*$')
+    if [ -z "${input}" ]; then
+        return
+    fi
+
+    local pattern=$(_make_select_pattern "${input}")
+    for t in $(_list_run_targets_with_env_by_sort); do
+        if [[ "${t}" == ${pattern} ]]; then
+            echo "${t}"
+        fi
+    done
+}
+
 _make_select_pattern() {
-    echo "${1}*" | sed 's/-/*-/g' | grep '^[a-z\*-][a-z\*-]*$'
+    echo "${1}*" | sed 's/-/*-/g'
 }
 
 _run_target() {

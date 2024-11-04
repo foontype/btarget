@@ -33,15 +33,33 @@ cde
 abc" ]
 }
 
-@test "_list_sourted_run_targets" {
-    compgen() {
-        case "${2}" in
-        */target.sh) echo "b/bcd/b c/cde/c a/abc/a ";;
-        */run.sh) echo "d/def/d f/fgh/f e/efg/e";;
-        esac
+@test "_list_run_targets_with_env" {
+    _list_run_targets() {
+        echo "def-on-x
+bcd
+cde
+abc-on-x"
     }
 
-    run _list_sorted_run_targets
+    TARGET_ENV="x"
+
+    run _list_run_targets_with_env
+
+    [ "${output}" = "def-on-x
+abc-on-x" ]
+}
+
+@test "_list_run_targets_with_env_by_sort" {
+    _list_run_targets() {
+        echo "bcd
+cde
+abc
+def
+fgh
+efg"
+    }
+
+    run _list_run_targets_with_env_by_sort
 
     [ "${output}" = "abc
 bcd
@@ -55,7 +73,7 @@ fgh" ]
     local expects=(
         '"ab" "ab*"'
         '"ab-cd" "ab*-cd*"'
-        '"!ab" ""'
+        '"!ab" "!ab*"'
     )
 
     for x in "${expects[@]}"; do
@@ -85,6 +103,6 @@ bcd-cde-def"
         echo "running ... ${x}"
         eval "set ${x}"
         run _select_run_targets "${1}"
-        [ "${output}" = "${2:-}" ]
+        [ "${output}" = "${2}" ]
     done
 }
