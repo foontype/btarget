@@ -15,5 +15,5 @@ task_down() {
 }
 
 task_test() {
-    docker compose exec workspace ./run/on-devcontainer-workspace/run.sh test
+    docker compose exec workspace ./run/on-workspace/run.sh test
 }
