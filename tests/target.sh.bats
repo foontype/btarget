@@ -52,18 +52,18 @@ fgh" ]
 }
 
 @test "_make_select_pattern" {
-    run _make_select_pattern "ab-cd"
-    [ "${output}" = "ab*-cd*" ]
-}
+    local expects=(
+        '"ab" "ab*"'
+        '"ab-cd" "ab*-cd*"'
+        '"!ab" ""'
+    )
 
-@test "_make_select_pattern: no shashes" {
-    run _make_select_pattern "ab"
-    [ "${output}" = "ab*" ]
-}
-
-@test "_make_select_pattern: invalid char becomes empty" {
-    run _make_select_pattern "!ab"
-    [ "${output}" = "" ]
+    for x in "${expects[@]}"; do
+        echo "running ... ${x}"
+        eval "set ${x}"
+        run _make_select_pattern "${1}"
+        [ "${output}" = "${2}" ]
+    done
 }
 
 @test "_select_run_targets" {
