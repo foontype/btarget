@@ -7,7 +7,7 @@ TARGET_SHELL=${TARGET_SHELL:-target.sh}
 TARGET_RUN_SHELL=${TARGET_RUN_SHELL:-run.sh}
 TARGET_DESC_FILENAME=${TARGET_DESC_FILENAME:-TARGETDESC}
 TARGET_ENV=${TARGET_ENV:-}
-TARGET_ENV_ON=${TARGET_ENV_ON:-on-}
+TARGET_ENV_PREFIX=${TARGET_ENV_PREFIX:-on-}
 
 _usage() {
     local error="${1}"
@@ -59,15 +59,14 @@ _list_run_targets() {
 
 _list_run_targets_with_env() {
     local env=$(echo "${TARGET_ENV}" | grep '^[a-z-][a-z-]*$')
-    local env_on="${TARGET_ENV_ON}"
 
     for t in $(_list_run_targets); do
         if [[ -z "${env}" ]]; then
-            if [[ "${t}" != ${env_on}* ]]; then
+            if [[ "${t}" != ${TARGET_ENV_PREFIX}* ]]; then
                 echo "${t}"
             fi
         else
-            if [[ "${t}" == "${env_on}${env}" ]] || [[ "${t}" == ${env_on}${env}-* ]]; then
+            if [[ "${t}" == "${TARGET_ENV_PREFIX}${env}" ]] || [[ "${t}" == ${TARGET_ENV_PREFIX}${env}-* ]]; then
                 echo "${t}"
             fi
         fi
