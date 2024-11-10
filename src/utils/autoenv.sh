@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
 autoenv() {
+    if [ -n "$(_autoenv_exist_file ".env")" ]; then
+        return
+    fi
+
     local ostype=$(_autoenv_ostype)
     if [ -n "${ostype}" -a -n "$(_autoenv_exist_file ".env.example.${ostype}")" ]; then
         cp ".env.example.${ostype}" ".env"

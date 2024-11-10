@@ -13,7 +13,7 @@ setup() {
     }
 
     _autoenv_exist_file() {
-        echo "yes"
+        [ ! "${1}" = ".env" ] && echo "yes"
     }
 
     autoenv
