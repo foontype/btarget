@@ -7,7 +7,7 @@ setup() {
 @test "auto env: linux" {
     OSTYPE=linux-test
 
-    mv() {
+    cp() {
         FROM="${1}"
         TO="${2}"
     }
@@ -25,7 +25,7 @@ setup() {
 @test "auto env: no file fallback" {
     OSTYPE=linux
 
-    mv() {
+    cp() {
         FROM="${1}"
         TO="${2}"
     }

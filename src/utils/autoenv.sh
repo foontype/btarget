@@ -3,9 +3,9 @@
 autoenv() {
     local ostype=$(_autoenv_ostype)
     if [ -n "${ostype}" -a -n "$(_autoenv_exist_file ".env.example.${ostype}")" ]; then
-        mv ".env.example.${ostype}" ".env"
+        cp ".env.example.${ostype}" ".env"
     elif [ -n "$(_autoenv_exist_file ".env.example")" ]; then
-        mv ".env.example" ".env"
+        cp ".env.example" ".env"
     fi
 }
 
