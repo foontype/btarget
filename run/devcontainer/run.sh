@@ -2,8 +2,12 @@
 set -e
 cd $(dirname "${0}")
 
+if [ ! -f ".env" ]; then
+    echo "no .env file in $(pwd)."
+    exit 1
+fi
+
 source ../supports/bask/src/bask.sh
-source ./.env
 
 bask_default_task="usage"
 

@@ -2,7 +2,7 @@
 set -e
 cd $(dirname ${0})
 
-source ../../src/target.sh
+source ../../src/btarget.sh
 
 if [ "${1}" == "??" ]; then
     trap - EXIT

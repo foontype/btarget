@@ -2,7 +2,7 @@
 
 setup() {
     local original_trap=$(trap -p EXIT)
-    source ${WORKSPACE_ROOT}/src/target.sh
+    source ${WORKSPACE_ROOT}/src/btarget.sh
     eval "${original_trap}"
 }
 
