@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-trap '[[ ${?} -eq 0 ]] && _bootstrap "${@}"' EXIT
+trap '[[ ${?} -eq 0 ]] && _btarget_bootstrap "${@}"' EXIT
 
 TARGETS_DIR=${TARGETS_DIR:-.}
 TARGET_SHELL=${TARGET_SHELL:-target.sh}
@@ -9,18 +9,18 @@ TARGET_DESC_FILENAME=${TARGET_DESC_FILENAME:-TARGETDESC}
 TARGET_ENV=${TARGET_ENV:-}
 TARGET_ENV_PREFIX=${TARGET_ENV_PREFIX:-on-}
 
-_usage() {
+_btarget_usage() {
     local error="${1}"
     local example_target="run-target"
-    local run_targets=($(_list_run_targets_with_env))
+    local run_targets=($(_btarget_list_run_targets_with_env))
 
     if [ "${#run_targets[@]}" -gt 0 ]; then
-        local max_length=$(_max_len "${run_targets[@]}")
+        local max_length=$(_btarget_max_len "${run_targets[@]}")
 
         echo ""
         echo "Available run targets:"
         for t in ${run_targets[*]}; do
-            local desc=$(_get_desc "${t}")
+            local desc=$(_btarget_get_desc "${t}")
             [ -z "${desc}" ] \
                 && echo " * ${t}" \
                 || printf " * %-${max_length}s   # %s\n" "${t}" "${desc}"
@@ -48,7 +48,7 @@ _usage() {
     exit 1
 }
 
-_list_run_targets() {
+_btarget_list_run_targets() {
     for t in $(compgen -G "${TARGETS_DIR}/*/${TARGET_SHELL}"); do
         echo $(basename $(dirname ${t}))
     done
@@ -57,10 +57,10 @@ _list_run_targets() {
     done
 }
 
-_list_run_targets_with_env() {
+_btarget_list_run_targets_with_env() {
     local env=$(echo "${TARGET_ENV}" | grep '^[a-z-][a-z-]*$')
 
-    for t in $(_list_run_targets); do
+    for t in $(_btarget_list_run_targets); do
         if [[ -z "${env}" ]]; then
             if [[ "${t}" != ${TARGET_ENV_PREFIX}* ]]; then
                 echo "${t}"
@@ -73,29 +73,29 @@ _list_run_targets_with_env() {
     done
 }
 
-_list_run_targets_with_env_by_sort() {
-    _list_run_targets_with_env | sort
+_btarget_list_run_targets_with_env_by_sort() {
+    _btarget_list_run_targets_with_env | sort
 }
 
-_select_run_targets() {
+_btarget_select_run_targets() {
     local input=$(echo "${1}" | grep '^[a-z-][a-z-]*$')
     if [ -z "${input}" ]; then
         return
     fi
 
-    local pattern=$(_make_select_pattern "${input}")
-    for t in $(_list_run_targets_with_env_by_sort); do
+    local pattern=$(_btarget_make_select_pattern "${input}")
+    for t in $(_btarget_list_run_targets_with_env_by_sort); do
         if [[ "${t}" == ${pattern} ]]; then
             echo "${t}"
         fi
     done
 }
 
-_make_select_pattern() {
+_btarget_make_select_pattern() {
     echo "${1}*" | sed 's/-/*-/g'
 }
 
-_run_target() {
+_btarget_run_target() {
     local run_target="${1}"
     local run_target_dir="${TARGETS_DIR}/${run_target}"
     local run_target_shell="./${TARGET_SHELL}"
@@ -113,7 +113,7 @@ _run_target() {
     ${run_target_shell} "${@}"
 }
 
-_get_desc() {
+_btarget_get_desc() {
     local run_target="${1}"
     local desc_path="./${run_target}/${TARGET_DESC_FILENAME}"
 
@@ -122,7 +122,7 @@ _get_desc() {
     fi
 }
 
-_max_len() {
+_btarget_max_len() {
     local arr=("${@}")
     local max_length=0
 
@@ -136,24 +136,24 @@ _max_len() {
     echo "${max_length}"
 }
 
-_bootstrap() {
+_btarget_bootstrap() {
     local input="${1}"
 
     case "${input}" in
     "")
-        _usage "please specify run target."
+        _btarget_usage "please specify run target."
         ;;
     *)
-        local run_targets=($(_select_run_targets "${input}"))
+        local run_targets=($(_btarget_select_run_targets "${input}"))
         if [ "${#run_targets[@]}" -eq 0 ]; then
-            _usage "unmatched run target."
+            _btarget_usage "unmatched run target."
         fi
         if [ "${#run_targets[@]}" -gt 1 ]; then
-            _usage "multiple run targets: ${run_targets[*]}"
+            _btarget_usage "multiple run targets: ${run_targets[*]}"
         fi
 
         shift
-        _run_target ${run_targets[0]} "${@}"
+        _btarget_run_target ${run_targets[0]} "${@}"
         ;;
     esac
 }

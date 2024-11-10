@@ -10,14 +10,14 @@ setup() {
     [ "${TARGETS_DIR}" = "." ]
 }
 
-@test "_max_len" {
+@test "_btarget_max_len" {
     local strings=("a" "bc" "def" "g" "hi" "jk")
-    local result=$(_max_len "${strings[@]}")
+    local result=$(_btarget_max_len "${strings[@]}")
 
     [ "$result" = "3" ]
 }
 
-@test "_list_run_targets" {
+@test "_btarget_list_run_targets" {
     compgen() {
         case "${2}" in
         */target.sh) echo "path/to/def/target.sh path/to/bcd/target.sh";;
@@ -25,7 +25,7 @@ setup() {
         esac
     }
 
-    run _list_run_targets
+    run _btarget_list_run_targets
 
     [ "${output}" = "def
 bcd
@@ -33,8 +33,8 @@ cde
 abc" ]
 }
 
-@test "_list_run_targets_with_env" {
-    _list_run_targets() {
+@test "_btarget_list_run_targets_with_env" {
+    _btarget_list_run_targets() {
         echo "on-x
 on-x-a
 bcd
@@ -44,14 +44,14 @@ on-y"
 
     TARGET_ENV="x"
 
-    run _list_run_targets_with_env
+    run _btarget_list_run_targets_with_env
 
     [ "${output}" = "on-x
 on-x-a" ]
 }
 
-@test "_list_run_targets_with_env_by_sort" {
-    _list_run_targets() {
+@test "_btarget_list_run_targets_with_env_by_sort" {
+    _btarget_list_run_targets() {
         echo "bcd
 cde
 abc
@@ -60,7 +60,7 @@ fgh
 efg"
     }
 
-    run _list_run_targets_with_env_by_sort
+    run _btarget_list_run_targets_with_env_by_sort
 
     [ "${output}" = "abc
 bcd
@@ -70,7 +70,7 @@ efg
 fgh" ]
 }
 
-@test "_make_select_pattern" {
+@test "_btarget_make_select_pattern" {
     local expects=(
         '"ab" "ab*"'
         '"ab-cd" "ab*-cd*"'
@@ -80,12 +80,12 @@ fgh" ]
     for x in "${expects[@]}"; do
         echo "running ... ${x}"
         eval "set ${x}"
-        run _make_select_pattern "${1}"
+        run _btarget_make_select_pattern "${1}"
         [ "${output}" = "${2}" ]
     done
 }
 
-@test "_select_run_targets" {
+@test "_btarget_select_run_targets" {
     local expects=(
         '"a-z" "" no-match.'
         '"a" "abc" match by simple abbreviation.'
@@ -94,7 +94,7 @@ fgh" ]
 bcd-cde-def" multiple match.'
     )
 
-    _list_run_targets() {
+    _btarget_list_run_targets() {
         echo "abc
 bcd-cde
 bcd-cde-def"
@@ -103,7 +103,7 @@ bcd-cde-def"
     for x in "${expects[@]}"; do
         echo "running ... ${x}"
         eval "set ${x}"
-        run _select_run_targets "${1}"
+        run _btarget_select_run_targets "${1}"
         [ "${output}" = "${2}" ]
     done
 }
