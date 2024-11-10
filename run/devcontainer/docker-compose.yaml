@@ -4,9 +4,8 @@ services:
       context: ../..
       dockerfile: ./run/containers/workspace/Dockerfile
       args:
-        - CONTAINER_USER
-        - CONTAINER_UID
-        - CONTAINER_GID
+        - CONTAINER_UID=${CONTAINER_UID:?}
+        - CONTAINER_GID=${CONTAINER_GID:?}
         - HTTP_PROXY
         - HTTPS_PROXY
         - NO_PROXY
@@ -15,7 +14,6 @@ services:
         - no_proxy
     environment:
       - WORKSPACE_ROOT=/workspace
-      - SHUNIT2=/usr/bin/shunit2
     command: sleep infinity
     volumes:
       - ../..:/workspace
