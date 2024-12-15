@@ -62,11 +62,11 @@ _btarget_list_run_targets_with_env() {
 
     for t in $(_btarget_list_run_targets); do
         if [[ -z "${env}" ]]; then
-            if [[ "${t}" != ${TARGET_ENV_PREFIX}* ]]; then
+            if [[ "${t}" != "${TARGET_ENV_PREFIX}"* ]] && [[ "${t}" != *"${TARGET_ENV_PREFIX}"* ]]; then
                 echo "${t}"
             fi
         else
-            if [[ "${t}" == "${TARGET_ENV_PREFIX}${env}" ]] || [[ "${t}" == ${TARGET_ENV_PREFIX}${env}-* ]]; then
+            if [[ "${t}" == "${TARGET_ENV_PREFIX}${env}" ]] || [[ "${t}" == *"-${TARGET_ENV_PREFIX}${env}" ]]; then
                 echo "${t}"
             fi
         fi
