@@ -35,20 +35,14 @@ abc" ]
 
 @test "_btarget_list_run_targets_with_env" {
     _btarget_list_run_targets() {
-        echo "on-x
-on-x-a
-a-on-x
-bcd
-cde
-on-y"
+        echo "${1}"
     }
 
     RUN_TARGET_ENV="x"
 
     run _btarget_list_run_targets_with_env
 
-    [ "${output}" = "on-x
-a-on-x" ]
+    [ "${output}" = "on-x" ]
 }
 
 @test "_btarget_list_run_targets_with_env_by_sort" {

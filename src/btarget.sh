@@ -5,7 +5,7 @@ trap '[[ ${?} -eq 0 ]] && _btarget_bootstrap "${@}"' EXIT
 RUN_TARGETS_DIR=${RUN_TARGETS_DIR:-.}
 RUN_TARGET_SHELL=${RUN_TARGET_SHELL:-target.sh}
 RUN_TARGET_RUN_SHELL=${RUN_TARGET_RUN_SHELL:-run.sh}
-RUN_TARGET_DESC_FILENAME=${RUN_TARGET_DESC_FILENAME:-RUNDESC}
+RUN_TARGET_DESC_FILENAME=${RUN_TARGET_DESC_FILENAME:-RUN_TARGET_DESC}
 RUN_TARGET_ENV=${RUN_TARGET_ENV:-}
 RUN_TARGET_ENV_PREFIX=${RUN_TARGET_ENV_PREFIX:-on-}
 
@@ -49,10 +49,12 @@ _btarget_usage() {
 }
 
 _btarget_list_run_targets() {
-    for t in $(compgen -G "${RUN_TARGETS_DIR}/*/${RUN_TARGET_SHELL}"); do
+    local filter="${1:+/}${1:-}"
+
+    for t in $(compgen -G "${RUN_TARGETS_DIR}${filter}/*/${RUN_TARGET_SHELL}"); do
         echo $(basename $(dirname ${t}))
     done
-    for t in $(compgen -G "${RUN_TARGETS_DIR}/*/${RUN_TARGET_RUN_SHELL}"); do
+    for t in $(compgen -G "${RUN_TARGETS_DIR}${filter}/*/${RUN_TARGET_RUN_SHELL}"); do
         echo $(basename $(dirname ${t}))
     done
 }
@@ -60,17 +62,7 @@ _btarget_list_run_targets() {
 _btarget_list_run_targets_with_env() {
     local env=$(echo "${RUN_TARGET_ENV}" | grep '^[a-z-][a-z-]*$')
 
-    for t in $(_btarget_list_run_targets); do
-        if [[ -z "${env}" ]]; then
-            if [[ "${t}" != "${RUN_TARGET_ENV_PREFIX}"* ]] && [[ "${t}" != *"${RUN_TARGET_ENV_PREFIX}"* ]]; then
-                echo "${t}"
-            fi
-        else
-            if [[ "${t}" == "${RUN_TARGET_ENV_PREFIX}${env}" ]] || [[ "${t}" == *"-${RUN_TARGET_ENV_PREFIX}${env}" ]]; then
-                echo "${t}"
-            fi
-        fi
-    done
+    _btarget_list_run_targets "${RUN_TARGET_ENV_PREFIX}${env}"
 }
 
 _btarget_list_run_targets_with_env_by_sort() {
