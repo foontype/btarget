@@ -22,7 +22,7 @@ _btarget_usage() {
         for t in ${run_targets[*]}; do
             local desc=$(_btarget_get_desc "${t}")
             [ -z "${desc}" ] \
-                && echo " * ${t}" \
+                && echo " * $(basename "${t}")" \
                 || printf " * %-${max_length}s   # %s\n" "${t}" "${desc}"
             example_target="${t}"
         done
@@ -49,20 +49,24 @@ _btarget_usage() {
 }
 
 _btarget_list_run_targets() {
-    local filter="${1:+/}${1:-}"
+    local filter="${1:-}${1:+/}"
 
-    for t in $(compgen -G "${RUN_TARGETS_DIR}${filter}/*/${RUN_TARGET_SHELL}"); do
-        echo $(basename $(dirname ${t}))
+    for t in $(compgen -G "${RUN_TARGETS_DIR}/${filter}*/${RUN_TARGET_SHELL}"); do
+        echo "${filter}$(basename $(dirname ${t}))"
     done
-    for t in $(compgen -G "${RUN_TARGETS_DIR}${filter}/*/${RUN_TARGET_RUN_SHELL}"); do
-        echo $(basename $(dirname ${t}))
+    for t in $(compgen -G "${RUN_TARGETS_DIR}/${filter}*/${RUN_TARGET_RUN_SHELL}"); do
+        echo "${filter}$(basename $(dirname ${t}))"
     done
 }
 
 _btarget_list_run_targets_with_env() {
     local env=$(echo "${RUN_TARGET_ENV}" | grep '^[a-z-][a-z-]*$')
 
-    _btarget_list_run_targets "${RUN_TARGET_ENV_PREFIX}${env}"
+    if [ "${env}" = "" ]; then
+        _btarget_list_run_targets
+    else
+        _btarget_list_run_targets "${RUN_TARGET_ENV_PREFIX}${env}"
+    fi
 }
 
 _btarget_list_run_targets_with_env_by_sort() {
@@ -77,7 +81,7 @@ _btarget_select_run_targets() {
 
     local pattern=$(_btarget_make_select_pattern "${input}")
     for t in $(_btarget_list_run_targets_with_env_by_sort); do
-        if [[ "${t}" == ${pattern} ]]; then
+        if [[ "$(basename "${t}")" == ${pattern} ]]; then
             echo "${t}"
         fi
     done
