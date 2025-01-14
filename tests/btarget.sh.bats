@@ -45,13 +45,26 @@ abc" ]
     [ "${output}" = "on-x" ]
 }
 
-@test "_btarget_list_run_targets_with_env_selected" {
+@test "_btarget_list_run_targets_with_env_restrict" {
     _btarget_list_run_targets() {
-        echo "${1}"
+        echo "t"
     }
 
     RUN_TARGET_ENV="x"
-    RUN_TARGET_ENV_SELECTED="on-x"
+    RUN_TARGET_ENV_EXPECTED_TO="x"
+
+    run _btarget_list_run_targets_with_env
+
+    [ "${output}" = "t" ]
+}
+
+@test "_btarget_list_run_targets_with_env_restrict_empty" {
+    _btarget_list_run_targets() {
+        echo "t"
+    }
+
+    RUN_TARGET_ENV="x"
+    RUN_TARGET_ENV_EXPECTED_TO="y"
 
     run _btarget_list_run_targets_with_env
 
