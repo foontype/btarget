@@ -2,7 +2,7 @@
 set -e
 cd $(dirname ${0})
 
-RUN_TARGET_ENV_EXPECTED_TO="example"
+RUN_TARGET_ENV_MAIN="example"
 
 source ../../../../src/btarget.sh
 

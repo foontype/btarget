@@ -8,7 +8,8 @@ RUN_TARGET_RUN_SHELL=${RUN_TARGET_RUN_SHELL:-run.sh}
 RUN_TARGET_DESC_FILENAME=${RUN_TARGET_DESC_FILENAME:-RUN_TARGET_DESC}
 RUN_TARGET_ENV=${RUN_TARGET_ENV:-}
 RUN_TARGET_ENV_PREFIX=${RUN_TARGET_ENV_PREFIX:-on-}
-RUN_TARGET_ENV_EXPECTED_TO=${RUN_TARGET_ENV_EXPECTED_TO:-}
+RUN_TARGET_ENV_DEFAULT=${RUN_TARGET_ENV_DEFAULT:-}
+RUN_TARGET_ENV_MAIN=${RUN_TARGET_ENV_MAIN:-}
 
 _btarget_usage() {
     local error="${1}"
@@ -63,10 +64,14 @@ _btarget_list_run_targets() {
 _btarget_list_run_targets_with_env() {
     local env=$(echo "${RUN_TARGET_ENV}" | grep '^[a-z-][a-z-]*$')
 
-    if [ -n "${RUN_TARGET_ENV_EXPECTED_TO}" ]; then
-        if [ "${RUN_TARGET_ENV_PREFIX}${env}" = "${RUN_TARGET_ENV_PREFIX}${RUN_TARGET_ENV_EXPECTED_TO}" ]; then
+    if [ -n "${RUN_TARGET_ENV_DEFAULT}" -a -z "${env}" ]; then
+        env="${RUN_TARGET_ENV_DEFAULT}"
+    fi
+
+    if [ -n "${RUN_TARGET_ENV_MAIN}" ]; then
+        if [ "${RUN_TARGET_ENV_PREFIX}${env}" = "${RUN_TARGET_ENV_PREFIX}${RUN_TARGET_ENV_MAIN}" ]; then
             env=""
-        else
+        elif [ -z "${env}" ]; then
             return
         fi
     fi
