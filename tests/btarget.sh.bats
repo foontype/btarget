@@ -45,6 +45,19 @@ abc" ]
     [ "${output}" = "on-x" ]
 }
 
+@test "_btarget_list_run_targets_with_env_selected" {
+    _btarget_list_run_targets() {
+        echo "${1}"
+    }
+
+    RUN_TARGET_ENV="x"
+    RUN_TARGET_ENV_SELECTED="on-x"
+
+    run _btarget_list_run_targets_with_env
+
+    [ "${output}" = "" ]
+}
+
 @test "_btarget_list_run_targets_with_env_by_sort" {
     _btarget_list_run_targets() {
         echo "bcd
