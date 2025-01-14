@@ -2,12 +2,12 @@
 
 trap '[[ ${?} -eq 0 ]] && _btarget_bootstrap "${@}"' EXIT
 
-TARGETS_DIR=${TARGETS_DIR:-.}
-TARGET_SHELL=${TARGET_SHELL:-target.sh}
-TARGET_RUN_SHELL=${TARGET_RUN_SHELL:-run.sh}
-TARGET_DESC_FILENAME=${TARGET_DESC_FILENAME:-TARGETDESC}
-TARGET_ENV=${TARGET_ENV:-}
-TARGET_ENV_PREFIX=${TARGET_ENV_PREFIX:-on-}
+RUN_TARGETS_DIR=${RUN_TARGETS_DIR:-.}
+RUN_TARGET_SHELL=${RUN_TARGET_SHELL:-target.sh}
+RUN_TARGET_RUN_SHELL=${RUN_TARGET_RUN_SHELL:-run.sh}
+RUN_TARGET_DESC_FILENAME=${RUN_TARGET_DESC_FILENAME:-RUNDESC}
+RUN_TARGET_ENV=${RUN_TARGET_ENV:-}
+RUN_TARGET_ENV_PREFIX=${RUN_TARGET_ENV_PREFIX:-on-}
 
 _btarget_usage() {
     local error="${1}"
@@ -49,24 +49,24 @@ _btarget_usage() {
 }
 
 _btarget_list_run_targets() {
-    for t in $(compgen -G "${TARGETS_DIR}/*/${TARGET_SHELL}"); do
+    for t in $(compgen -G "${RUN_TARGETS_DIR}/*/${RUN_TARGET_SHELL}"); do
         echo $(basename $(dirname ${t}))
     done
-    for t in $(compgen -G "${TARGETS_DIR}/*/${TARGET_RUN_SHELL}"); do
+    for t in $(compgen -G "${RUN_TARGETS_DIR}/*/${RUN_TARGET_RUN_SHELL}"); do
         echo $(basename $(dirname ${t}))
     done
 }
 
 _btarget_list_run_targets_with_env() {
-    local env=$(echo "${TARGET_ENV}" | grep '^[a-z-][a-z-]*$')
+    local env=$(echo "${RUN_TARGET_ENV}" | grep '^[a-z-][a-z-]*$')
 
     for t in $(_btarget_list_run_targets); do
         if [[ -z "${env}" ]]; then
-            if [[ "${t}" != "${TARGET_ENV_PREFIX}"* ]] && [[ "${t}" != *"${TARGET_ENV_PREFIX}"* ]]; then
+            if [[ "${t}" != "${RUN_TARGET_ENV_PREFIX}"* ]] && [[ "${t}" != *"${RUN_TARGET_ENV_PREFIX}"* ]]; then
                 echo "${t}"
             fi
         else
-            if [[ "${t}" == "${TARGET_ENV_PREFIX}${env}" ]] || [[ "${t}" == *"-${TARGET_ENV_PREFIX}${env}" ]]; then
+            if [[ "${t}" == "${RUN_TARGET_ENV_PREFIX}${env}" ]] || [[ "${t}" == *"-${RUN_TARGET_ENV_PREFIX}${env}" ]]; then
                 echo "${t}"
             fi
         fi
@@ -97,9 +97,9 @@ _btarget_make_select_pattern() {
 
 _btarget_run_target() {
     local run_target="${1}"
-    local run_target_dir="${TARGETS_DIR}/${run_target}"
-    local run_target_shell="./${TARGET_SHELL}"
-    local run_target_run_shell="./${TARGET_RUN_SHELL}"
+    local run_target_dir="${RUN_TARGETS_DIR}/${run_target}"
+    local run_target_shell="./${RUN_TARGET_SHELL}"
+    local run_target_run_shell="./${RUN_TARGET_RUN_SHELL}"
 
     shift
 
@@ -115,7 +115,7 @@ _btarget_run_target() {
 
 _btarget_get_desc() {
     local run_target="${1}"
-    local desc_path="./${run_target}/${TARGET_DESC_FILENAME}"
+    local desc_path="./${run_target}/${RUN_TARGET_DESC_FILENAME}"
 
     if [ -f "${desc_path}" ]; then
         cat "${desc_path}" | head -n 1

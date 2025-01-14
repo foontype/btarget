@@ -6,8 +6,8 @@ setup() {
     eval "${original_trap}"
 }
 
-@test "TARGETS_DIR" {
-    [ "${TARGETS_DIR}" = "." ]
+@test "RUN_TARGETS_DIR" {
+    [ "${RUN_TARGETS_DIR}" = "." ]
 }
 
 @test "_btarget_max_len" {
@@ -37,17 +37,18 @@ abc" ]
     _btarget_list_run_targets() {
         echo "on-x
 on-x-a
+a-on-x
 bcd
 cde
 on-y"
     }
 
-    TARGET_ENV="x"
+    RUN_TARGET_ENV="x"
 
     run _btarget_list_run_targets_with_env
 
     [ "${output}" = "on-x
-on-x-a" ]
+a-on-x" ]
 }
 
 @test "_btarget_list_run_targets_with_env_by_sort" {

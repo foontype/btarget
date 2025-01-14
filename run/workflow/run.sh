@@ -10,6 +10,6 @@ task_usage() {
     bask_list_tasks
 }
 
-task_down() {
-    docker compose down
+task_test() {
+    (cd ../devcontainer && docker compose exec workspace ./run/workflow-on-workspace/run.sh test)
 }
