@@ -8,6 +8,7 @@ RUN_TARGET_RUN_SHELL=${RUN_TARGET_RUN_SHELL:-run.sh}
 RUN_TARGET_DESC_FILENAME=${RUN_TARGET_DESC_FILENAME:-RUN_TARGET_DESC}
 RUN_TARGET_ENV=${RUN_TARGET_ENV:-}
 RUN_TARGET_ENV_PREFIX=${RUN_TARGET_ENV_PREFIX:-on-}
+RUN_TARGET_ENV_SELECTED=${RUN_TARGET_ENV_SELECTED:-}
 
 _btarget_usage() {
     local error="${1}"
@@ -62,7 +63,7 @@ _btarget_list_run_targets() {
 _btarget_list_run_targets_with_env() {
     local env=$(echo "${RUN_TARGET_ENV}" | grep '^[a-z-][a-z-]*$')
 
-    if [ "${env}" = "" ]; then
+    if [ "${env}" = "" -o "${RUN_TARGET_ENV_PREFIX}${env}" = "${RUN_TARGET_ENV_SELECTED}" ]; then
         _btarget_list_run_targets
     else
         _btarget_list_run_targets "${RUN_TARGET_ENV_PREFIX}${env}"
