@@ -11,5 +11,5 @@ task_usage() {
 }
 
 task_test() {
-    (cd ../devcontainer && docker compose exec workspace ./run/workflow-on-workspace/run.sh test)
+    (cd ../devcontainer && docker compose exec workspace ./run/on-workspace/workflow/run.sh test)
 }
