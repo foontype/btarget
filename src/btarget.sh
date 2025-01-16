@@ -13,21 +13,11 @@ RUN_TARGET_ENV_MAIN=${RUN_TARGET_ENV_MAIN:-}
 
 _btarget_usage() {
     local error="${1}"
-    local example_target="run-target"
     local run_targets=($(_btarget_list_run_targets_with_env))
 
     if [ "${#run_targets[@]}" -gt 0 ]; then
         local max_length=$(_btarget_max_len "${run_targets[@]}")
-
-        echo ""
-        echo "Available run targets:"
-        for t in ${run_targets[*]}; do
-            local desc=$(_btarget_get_desc "${t}")
-            [ -z "${desc}" ] \
-                && echo " * $(basename "${t}")" \
-                || printf " * %-${max_length}s   # %s\n" "${t}" "${desc}"
-            example_target="${t}"
-        done
+        local example_target="${run_targets[0]}"
 
         echo ""
         echo "Usage:"
@@ -36,8 +26,17 @@ _btarget_usage() {
         echo "  ex) ${0} ${example_target}"
 
         echo ""
-        echo "  run target can be abbreviated at each slash."
+        echo "  run target can be abbreviated at each dash."
         echo "  for instance, \"th-i-ap\" matches \"this-is-apple\"."
+
+        echo ""
+        echo "Available run targets:"
+        for t in ${run_targets[*]}; do
+            local desc=$(_btarget_get_desc "${t}")
+            [ -z "${desc}" ] \
+                && echo "  * $(basename "${t}")" \
+                || printf "  * %-${max_length}s   # %s\n" "${t}" "${desc}"
+        done
         echo ""
     else
         error="no run targets found."
