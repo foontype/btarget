@@ -2,12 +2,12 @@
 
 setup() {
     local original_trap=$(trap -p EXIT)
-    source ${WORKSPACE_ROOT}/src/target.sh
+    source ${WORKSPACE_ROOT}/src/btarget.sh
     eval "${original_trap}"
 }
 
-@test "RUN_TARGETS_DIR" {
-    [ "${RUN_TARGETS_DIR}" = "." ]
+@test "RUN_TARGET_CATALOG_DIR" {
+    [ "${RUN_TARGET_CATALOG_DIR}" = "." ]
 }
 
 @test "_btarget_max_len" {
@@ -22,6 +22,8 @@ setup() {
         case "${2}" in
         */target.sh) echo "path/to/def/target.sh path/to/bcd/target.sh";;
         */run.sh) echo "path/to/cde/run.sh path/to/abc/run.sh";;
+        */task.sh) echo "path/to/ghi/run.sh path/to/hij/run.sh";;
+        */workflow.sh) echo "path/to/ijk/run.sh path/to/jkl/run.sh";;
         esac
     }
 
@@ -30,7 +32,11 @@ setup() {
     [ "${output}" = "def
 bcd
 cde
-abc" ]
+abc
+ghi
+hij
+ijk
+jkl" ]
 }
 
 @test "_btarget_list_run_targets_with_env" {
