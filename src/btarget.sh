@@ -19,7 +19,7 @@ _btarget_usage() {
         local example_target="${run_targets[0]}"
 
         echo ""
-        echo "Usage:"
+        echo "usage:"
         echo "  ${0} <run target>"
         echo ""
         echo "  ex) ${0} ${example_target}"
@@ -29,7 +29,7 @@ _btarget_usage() {
         echo "  for instance, \"th-i-ap\" matches \"this-is-apple\"."
 
         echo ""
-        echo "Available run targets:"
+        echo "available run targets:"
         for t in ${run_targets[*]}; do
             local desc=$(_btarget_get_desc "${t}")
             [ -z "${desc}" ] \
