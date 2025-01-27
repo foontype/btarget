@@ -17,6 +17,31 @@ setup() {
     [ "$result" = "3" ]
 }
 
+@test "_btarget_current_env" {
+    RUN_TARGET_ENV="x"
+
+    run _btarget_current_env
+
+    [ "${output}" = "x" ]
+}
+
+@test "_btarget_current_env_invalid" {
+    RUN_TARGET_ENV="InVaLiDEnV"
+
+    run _btarget_current_env
+
+    [ "${output}" = "unknown" ]
+}
+
+@test "_btarget_current_env_invalid_changed" {
+    RUN_TARGET_ENV="InVaLiDEnV"
+    RUN_TARGET_ENV_INVALID="expected_invalid_env"
+
+    run _btarget_current_env
+
+    [ "${output}" = "expected_invalid_env" ]
+}
+
 @test "_btarget_list_run_targets" {
     compgen() {
         case "${2}" in
@@ -49,100 +74,6 @@ jkl" ]
     run _btarget_list_run_targets_with_env
 
     [ "${output}" = "on-x" ]
-}
-
-@test "_btarget_list_run_targets_with_env_main" {
-    _btarget_list_run_targets() {
-        echo "filter=${1}"
-    }
-
-    RUN_TARGET_ENV="x"
-    RUN_TARGET_ENV_MAIN="x"
-
-    run _btarget_list_run_targets_with_env
-
-    [ "${output}" = "filter=" ]
-}
-
-@test "_btarget_list_run_targets_with_env_main_wrong" {
-    _btarget_list_run_targets() {
-        echo "filter=${1}"
-    }
-
-    RUN_TARGET_ENV="x"
-    RUN_TARGET_ENV_MAIN="y"
-
-    run _btarget_list_run_targets_with_env
-
-    [ "${output}" = "filter=on-x" ]
-}
-
-@test "_btarget_list_run_targets_with_env_default" {
-    _btarget_list_run_targets() {
-        echo "filter=${1}"
-    }
-
-    RUN_TARGET_ENV=""
-    RUN_TARGET_ENV_DEFAULT="x"
-
-    run _btarget_list_run_targets_with_env
-
-    [ "${output}" = "filter=on-x" ]
-}
-
-@test "_btarget_list_run_targets_with_env_no_default" {
-    _btarget_list_run_targets() {
-        echo "filter=${1}"
-    }
-
-    RUN_TARGET_ENV="y"
-    RUN_TARGET_ENV_DEFAULT="x"
-
-    run _btarget_list_run_targets_with_env
-
-    [ "${output}" = "filter=on-y" ]
-}
-
-@test "_btarget_list_run_targets_with_env_default_main" {
-    _btarget_list_run_targets() {
-        echo "filter=${1}"
-    }
-
-    RUN_TARGET_ENV=""
-    RUN_TARGET_ENV_DEFAULT="x"
-    RUN_TARGET_ENV_MAIN="x"
-
-    run _btarget_list_run_targets_with_env
-
-    [ "${output}" = "filter=" ]
-}
-
-@test "_btarget_list_run_targets_with_env_no_default_main" {
-    _btarget_list_run_targets() {
-        echo "filter=${1}"
-    }
-
-    RUN_TARGET_ENV="y"
-    RUN_TARGET_ENV_DEFAULT="x"
-    RUN_TARGET_ENV_MAIN="x"
-
-    run _btarget_list_run_targets_with_env
-
-    [ "${output}" = "filter=on-y" ]
-}
-
-@test "_btarget_list_run_targets_with_env_default_main_wrong" {
-    _btarget_list_run_targets() {
-        echo "filter=${1}"
-    }
-
-    RUN_TARGET_ENV=""
-    RUN_TARGET_ENV_DEFAULT="x"
-    RUN_TARGET_ENV_MAIN="y"
-
-    run _btarget_list_run_targets_with_env
-
-    [ "${output}" = "filter=on-x" ]
 }
 
 @test "_btarget_list_run_targets_with_env_by_sort" {

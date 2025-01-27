@@ -7,8 +7,7 @@ RUN_TARGET_NEXT_SHELLS=${RUN_TARGET_NEXT_SHELLS:-target.sh run.sh task.sh workfl
 RUN_TARGET_DESC_FILENAME=${RUN_TARGET_DESC_FILENAME:-RUN_TARGET_DESC}
 RUN_TARGET_ENV=${RUN_TARGET_ENV:-}
 RUN_TARGET_ENV_PREFIX=${RUN_TARGET_ENV_PREFIX:-on-}
-RUN_TARGET_ENV_DEFAULT=${RUN_TARGET_ENV_DEFAULT:-}
-RUN_TARGET_ENV_MAIN=${RUN_TARGET_ENV_MAIN:-}
+RUN_TARGET_ENV_INVALID=${RUN_TARGET_ENV_INVALID:-unknown}
 
 _btarget_usage() {
     local error="${1}"
@@ -59,19 +58,7 @@ _btarget_list_run_targets() {
 }
 
 _btarget_list_run_targets_with_env() {
-    local env=$(echo "${RUN_TARGET_ENV}" | grep '^[a-z-][a-z-]*$')
-
-    if [ -n "${RUN_TARGET_ENV_DEFAULT}" -a -z "${env}" ]; then
-        env="${RUN_TARGET_ENV_DEFAULT}"
-    fi
-
-    if [ -n "${RUN_TARGET_ENV_MAIN}" ]; then
-        if [ "${env}" = "${RUN_TARGET_ENV_MAIN}" ]; then
-            env=""
-        elif [ -z "${env}" ]; then
-            return
-        fi
-    fi
+    local env=$(_btarget_current_env)
 
     if [ -z "${env}" ]; then
         _btarget_list_run_targets
@@ -117,7 +104,19 @@ _btarget_run_target() {
         exit 1
     fi
 
-    ${next_shell} "${@}"
+    # NOTE: once RUN_TARGET_ENV used, no longer needed.
+    RUN_TARGET_ENV= ${next_shell} "${@}"
+}
+
+_btarget_current_env() {
+    local env=$(echo "${RUN_TARGET_ENV}" | grep '^[a-z-][a-z-]*$')
+
+    if [ ! "${env}" = "${RUN_TARGET_ENV}" ]; then
+        echo "${RUN_TARGET_ENV_INVALID}"
+        return
+    fi
+
+    echo "${env}"
 }
 
 _btarget_get_next_shell() {
