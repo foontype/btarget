@@ -66,7 +66,7 @@ _btarget_list_run_targets_with_env() {
     fi
 
     if [ -n "${RUN_TARGET_ENV_MAIN}" ]; then
-        if [ "${RUN_TARGET_ENV_PREFIX}${env}" = "${RUN_TARGET_ENV_PREFIX}${RUN_TARGET_ENV_MAIN}" ]; then
+        if [ "${env}" = "${RUN_TARGET_ENV_MAIN}" ]; then
             env=""
         elif [ -z "${env}" ]; then
             return
