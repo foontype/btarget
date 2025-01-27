@@ -2,7 +2,7 @@
 
 trap '[[ ${?} -eq 0 ]] && _btarget_bootstrap "${@}"' EXIT
 
-RUN_TARGET_CATALOG_DIR=${RUN_TARGET_CATALOG_DIR:-.}
+RUN_TARGET_SEARCH_DIR=${RUN_TARGET_SEARCH_DIR:-.}
 RUN_TARGET_NEXT_SHELLS=${RUN_TARGET_NEXT_SHELLS:-target.sh run.sh task.sh workflow.sh}
 RUN_TARGET_DESC_FILENAME=${RUN_TARGET_DESC_FILENAME:-RUN_TARGET_DESC}
 RUN_TARGET_ENV=${RUN_TARGET_ENV:-}
@@ -52,7 +52,7 @@ _btarget_list_run_targets() {
     local filter="${1:-}${1:+/}"
 
     for s in ${RUN_TARGET_NEXT_SHELLS}; do
-        for t in $(compgen -G "${RUN_TARGET_CATALOG_DIR}/${filter}*/${s}"); do
+        for t in $(compgen -G "${RUN_TARGET_SEARCH_DIR}/${filter}*/${s}"); do
             echo "${filter}$(basename $(dirname ${t}))"
         done
     done
@@ -104,7 +104,7 @@ _btarget_make_select_pattern() {
 
 _btarget_run_target() {
     local run_target="${1}"
-    local run_target_dir="${RUN_TARGET_CATALOG_DIR}/${run_target}"
+    local run_target_dir="${RUN_TARGET_SEARCH_DIR}/${run_target}"
 
     shift
 

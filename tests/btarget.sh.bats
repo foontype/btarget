@@ -6,8 +6,8 @@ setup() {
     eval "${original_trap}"
 }
 
-@test "RUN_TARGET_CATALOG_DIR" {
-    [ "${RUN_TARGET_CATALOG_DIR}" = "." ]
+@test "RUN_TARGET_SEARCH_DIR" {
+    [ "${RUN_TARGET_SEARCH_DIR}" = "." ]
 }
 
 @test "_btarget_max_len" {
