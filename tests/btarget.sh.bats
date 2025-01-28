@@ -66,7 +66,7 @@ jkl" ]
 
 @test "_btarget_list_run_target_dirs_only_available" {
     _btarget_list_run_target_dirs() {
-        echo "on-x"
+        echo "on-x on-y z"
     }
 
     RUN_TARGET_ENV="x"
