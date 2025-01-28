@@ -86,7 +86,7 @@ b
 c"
     }
 
-    RUN_TARGET_SEARCH_SHELL="*"
+    RUN_TARGET_SEARCH_SHELLS="*"
 
     run _btarget_list_run_targets
 
