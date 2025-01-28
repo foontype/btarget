@@ -85,10 +85,6 @@ _btarget_select_run_targets() {
     done
 }
 
-_btarget_make_select_pattern() {
-    echo "${1}*" | sed 's/-/*-/g'
-}
-
 _btarget_run_target() {
     local run_target="${1}"
     local run_target_dir="${RUN_TARGET_SEARCH_DIR}/${run_target}"
@@ -106,6 +102,10 @@ _btarget_run_target() {
 
     # NOTE: once RUN_TARGET_ENV used, no longer needed.
     RUN_TARGET_ENV= ${next_shell} "${@}"
+}
+
+_btarget_make_select_pattern() {
+    echo "${1}*" | sed 's/-/*-/g'
 }
 
 _btarget_current_env() {
