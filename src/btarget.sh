@@ -3,6 +3,8 @@
 trap '[[ ${?} -eq 0 ]] && _btarget_bootstrap "${@}"' EXIT
 
 RUN_TARGET_SEARCH_DIR=${RUN_TARGET_SEARCH_DIR:-.}
+RUN_TARGET_SEARCH_SHELL=${RUN_TARGET_SEARCH_SHELL:-}
+RUN_TARGET_SEARCH_SHELL_EXT=${RUN_TARGET_SEARCH_SHELL_EXT:-.sh}
 RUN_TARGET_NEXT_SHELLS=${RUN_TARGET_NEXT_SHELLS:-target.sh run.sh task.sh workflow.sh}
 RUN_TARGET_DESC_FILENAME=${RUN_TARGET_DESC_FILENAME:-RUN_TARGET_DESC}
 RUN_TARGET_ENV=${RUN_TARGET_ENV:-}
@@ -11,7 +13,7 @@ RUN_TARGET_ENV_INVALID=${RUN_TARGET_ENV_INVALID:-unknown}
 
 _btarget_usage() {
     local error="${1}"
-    local run_targets=($(_btarget_list_run_targets_only_available_sorted))
+    local run_targets=($(_btarget_list_run_targets_sorted))
 
     if [ "${#run_targets[@]}" -gt 0 ]; then
         local max_length=$(_btarget_max_len "${run_targets[@]}")
@@ -53,17 +55,17 @@ _btarget_error() {
     exit 1
 }
 
-_btarget_list_run_targets() {
+_btarget_list_run_target_dirs() {
     for s in ${RUN_TARGET_NEXT_SHELLS}; do
-        for t in $(compgen -G "${RUN_TARGET_SEARCH_DIR}/*/${s}"); do
+        for t in $(compgen -G "${RUN_TARGET_SEARCH_DIR}/${sub_dir}/*/${s}"); do
             echo "$(basename $(dirname ${t}))"
         done
     done
 }
 
-_btarget_list_run_targets_only_available() {
+_btarget_list_run_target_dirs_only_available() {
     local env=$(_btarget_current_env)
-    local run_targets=$(_btarget_list_run_targets)
+    local run_targets=$(_btarget_list_run_target_dirs)
 
     if [ -z "${env}" ]; then
         local prefixed_env=$(_btarget_prefixed_env)
@@ -82,27 +84,55 @@ _btarget_list_run_targets_only_available() {
     fi
 }
 
-_btarget_list_run_targets_only_available_sorted() {
-    _btarget_list_run_targets_only_available | sort
+_btarget_list_run_target_shells() {
+    for t in $(compgen -G "${RUN_TARGET_SEARCH_DIR}/${RUN_TARGET_SEARCH_SHELL}"); do
+        echo "$(basename "${t}" "${RUN_TARGET_SEARCH_SHELL_EXT}")"
+    done
+}
+
+_btarget_list_run_targets() {
+    if [ -n "${RUN_TARGET_SEARCH_SHELL}" ]; then
+        _btarget_list_run_target_shells
+        return
+    fi
+
+    _btarget_list_run_target_dirs_only_available
+}
+
+_btarget_list_run_targets_sorted() {
+    _btarget_list_run_targets | sort
 }
 
 _btarget_select_run_targets() {
     local input=$(echo "${1}" | grep '^[a-z-][a-z0-9-]*$')
+
     if [ -z "${input}" ]; then
         return
     fi
 
     local pattern=$(_btarget_make_select_pattern "${input}")
-    for t in $(_btarget_list_run_targets_only_available_sorted); do
+    for t in $(_btarget_list_run_targets_sorted); do
         if [[ "$(basename "${t}")" == ${pattern} ]]; then
             echo "${t}"
         fi
     done
 }
 
-_btarget_run_target_selected() {
-    local run_target="${1}"
-    local run_target_dir="${RUN_TARGET_SEARCH_DIR}/${run_target}"
+_btarget_run_target_next_shell() {
+    local next_shell="${1}"
+
+    shift
+
+    if [ -z "${next_shell}" ]; then
+        _btarget_error "no next shell"
+    fi
+
+    # NOTE: once RUN_TARGET_ENV used, no longer needed.
+    RUN_TARGET_ENV= bash ${next_shell} "${@}"
+}
+
+_btarget_run_target_selected_dir() {
+    local run_target_dir="${1}"
 
     shift
 
@@ -110,16 +140,46 @@ _btarget_run_target_selected() {
     echo "(in $(pwd))"
 
     local next_shell=$(_btarget_get_next_shell)
-    if [ -z "${next_shell}" ]; then
-        _btarget_error "no next shell"
+    _btarget_run_target_next_shell "${next_shell}" "${@}"
+}
+
+_btarget_run_target_selected_shell() {
+    local run_target_shell="${1}"
+
+    shift
+
+    cd $(dirname "${run_target_shell}")
+    echo "(in $(pwd))"
+
+    local next_shell="./$(basename ${run_target_shell})"
+    _btarget_run_target_next_shell "${next_shell}" "${@}"
+}
+
+_btarget_run_target_selected() {
+    local run_target="${1}"
+    local run_target_path="${RUN_TARGET_SEARCH_DIR}/${run_target}"
+
+    shift
+
+    if [ -f "${run_target_path}${RUN_TARGET_SEARCH_SHELL_EXT}" ]; then
+        _btarget_run_target_selected_shell "${run_target_path}${RUN_TARGET_SEARCH_SHELL_EXT}" "${@}"
+        return
     fi
 
-    # NOTE: once RUN_TARGET_ENV used, no longer needed.
-    RUN_TARGET_ENV= ${next_shell} "${@}"
+    _btarget_run_target_selected_dir "${run_target_path}" "${@}"
 }
 
 _btarget_run_target() {
     local input="${1}"
+
+    # NOTE: auto-select by env, or consume first selector.
+    local env=$(_btarget_current_env)
+    if [ -n "${env}" -a -z "${RUN_TARGET_SEARCH_SHELL}" ]; then
+        local prefixed_env=$(_btarget_prefixed_env "${env}")
+        input="${prefixed_env}"
+    elif [ ${#} -gt 0 ]; then
+        shift
+    fi
 
     if [ "${input}" = "" ]; then
         _btarget_usage "please specify run target."
@@ -133,7 +193,6 @@ _btarget_run_target() {
         _btarget_usage "multiple run targets: ${run_targets[*]}"
     fi
 
-    shift
     _btarget_run_target_selected ${run_targets[0]} "${@}"
 }
 
@@ -191,13 +250,5 @@ _btarget_max_len() {
 }
 
 _btarget_bootstrap() {
-    local env=$(_btarget_current_env)
-
-    if [ -n "${env}" ]; then
-        local prefixed_env=$(_btarget_prefixed_env "${env}")
-        _btarget_run_target "${prefixed_env}" "${@}"
-        return
-    fi
-
     _btarget_run_target "${@}"
 }
