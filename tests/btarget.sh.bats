@@ -64,19 +64,19 @@ ijk
 jkl" ]
 }
 
-@test "_btarget_list_run_targets_with_env" {
+@test "_btarget_list_run_targets_only_available" {
     _btarget_list_run_targets() {
-        echo "${1}"
+        echo "on-x"
     }
 
     RUN_TARGET_ENV="x"
 
-    run _btarget_list_run_targets_with_env
+    run _btarget_list_run_targets_only_available
 
     [ "${output}" = "on-x" ]
 }
 
-@test "_btarget_list_run_targets_with_env_by_sort" {
+@test "_btarget_list_run_targets_only_available_sorted" {
     _btarget_list_run_targets() {
         echo "bcd
 cde
@@ -86,7 +86,7 @@ fgh
 efg"
     }
 
-    run _btarget_list_run_targets_with_env_by_sort
+    run _btarget_list_run_targets_only_available_sorted
 
     [ "${output}" = "abc
 bcd

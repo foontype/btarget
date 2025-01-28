@@ -2,7 +2,7 @@
 set -e
 cd $(dirname "${0}")
 
-source ../../supports/bask/src/bask.sh
+source ../supports/bask/src/bask.sh
 
 bask_default_task="usage"
 
@@ -11,11 +11,11 @@ task_usage() {
 }
 
 task_test() {
-    cd ../../..
+    cd ../..
     bats --print-output-on-failure --pretty --recursive ./tests
 }
 
 task_tap() {
-    cd ../../..
+    cd ../..
     bats --tap ./tests
 }

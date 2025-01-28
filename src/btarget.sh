@@ -11,7 +11,7 @@ RUN_TARGET_ENV_INVALID=${RUN_TARGET_ENV_INVALID:-unknown}
 
 _btarget_usage() {
     local error="${1}"
-    local run_targets=($(_btarget_list_run_targets_with_env))
+    local run_targets=($(_btarget_list_run_targets_only_available_sorted))
 
     if [ "${#run_targets[@]}" -gt 0 ]; then
         local max_length=$(_btarget_max_len "${run_targets[@]}")
@@ -41,51 +41,66 @@ _btarget_usage() {
     fi
 
     if [ -n "${error}" ]; then
-        echo "Error: ${error}"
+        _btarget_error "${error}"
     fi
 
     exit 1
 }
 
-_btarget_list_run_targets() {
-    local filter="${1:-}${1:+/}"
+_btarget_error() {
+    local error="${1}"
+    echo "Error: ${error}"
+    exit 1
+}
 
+_btarget_list_run_targets() {
     for s in ${RUN_TARGET_NEXT_SHELLS}; do
-        for t in $(compgen -G "${RUN_TARGET_SEARCH_DIR}/${filter}*/${s}"); do
-            echo "${filter}$(basename $(dirname ${t}))"
+        for t in $(compgen -G "${RUN_TARGET_SEARCH_DIR}/*/${s}"); do
+            echo "$(basename $(dirname ${t}))"
         done
     done
 }
 
-_btarget_list_run_targets_with_env() {
+_btarget_list_run_targets_only_available() {
     local env=$(_btarget_current_env)
+    local run_targets=$(_btarget_list_run_targets)
 
     if [ -z "${env}" ]; then
-        _btarget_list_run_targets
+        local prefixed_env=$(_btarget_prefixed_env)
+        for t in ${run_targets}; do
+            if [ ! "${t}" = "${prefixed_env}"* ]; then
+                echo "${t}"
+            fi
+        done
     else
-        _btarget_list_run_targets "${RUN_TARGET_ENV_PREFIX}${env}"
+        local prefixed_env=$(_btarget_prefixed_env "${env}")
+        for t in ${run_targets}; do
+            if [ "${t}" = "${prefixed_env}" ]; then
+                echo "${t}"
+            fi
+        done
     fi
 }
 
-_btarget_list_run_targets_with_env_by_sort() {
-    _btarget_list_run_targets_with_env | sort
+_btarget_list_run_targets_only_available_sorted() {
+    _btarget_list_run_targets_only_available | sort
 }
 
 _btarget_select_run_targets() {
-    local input=$(echo "${1}" | grep '^[a-z-][a-z-]*$')
+    local input=$(echo "${1}" | grep '^[a-z-][a-z0-9-]*$')
     if [ -z "${input}" ]; then
         return
     fi
 
     local pattern=$(_btarget_make_select_pattern "${input}")
-    for t in $(_btarget_list_run_targets_with_env_by_sort); do
+    for t in $(_btarget_list_run_targets_only_available_sorted); do
         if [[ "$(basename "${t}")" == ${pattern} ]]; then
             echo "${t}"
         fi
     done
 }
 
-_btarget_run_target() {
+_btarget_run_target_selected() {
     local run_target="${1}"
     local run_target_dir="${RUN_TARGET_SEARCH_DIR}/${run_target}"
 
@@ -96,12 +111,30 @@ _btarget_run_target() {
 
     local next_shell=$(_btarget_get_next_shell)
     if [ -z "${next_shell}" ]; then
-        echo "no next shell"
-        exit 1
+        _btarget_error "no next shell"
     fi
 
     # NOTE: once RUN_TARGET_ENV used, no longer needed.
     RUN_TARGET_ENV= ${next_shell} "${@}"
+}
+
+_btarget_run_target() {
+    local input="${1}"
+
+    if [ "${input}" = "" ]; then
+        _btarget_usage "please specify run target."
+    fi
+
+    local run_targets=($(_btarget_select_run_targets "${input}"))
+    if [ "${#run_targets[@]}" -eq 0 ]; then
+        _btarget_usage "unmatched run target."
+    fi
+    if [ "${#run_targets[@]}" -gt 1 ]; then
+        _btarget_usage "multiple run targets: ${run_targets[*]}"
+    fi
+
+    shift
+    _btarget_run_target_selected ${run_targets[0]} "${@}"
 }
 
 _btarget_make_select_pattern() {
@@ -109,7 +142,7 @@ _btarget_make_select_pattern() {
 }
 
 _btarget_current_env() {
-    local env=$(echo "${RUN_TARGET_ENV}" | grep '^[a-z-][a-z-]*$')
+    local env=$(echo "${RUN_TARGET_ENV}" | grep '^[a-z-][a-z0-9-]*$')
 
     if [ ! "${env}" = "${RUN_TARGET_ENV}" ]; then
         echo "${RUN_TARGET_ENV_INVALID}"
@@ -117,6 +150,12 @@ _btarget_current_env() {
     fi
 
     echo "${env}"
+}
+
+_btarget_prefixed_env() {
+    local env="${1:-}"
+
+    echo "${RUN_TARGET_ENV_PREFIX}${env}"
 }
 
 _btarget_get_next_shell() {
@@ -152,23 +191,13 @@ _btarget_max_len() {
 }
 
 _btarget_bootstrap() {
-    local input="${1}"
+    local env=$(_btarget_current_env)
 
-    case "${input}" in
-    "")
-        _btarget_usage "please specify run target."
-        ;;
-    *)
-        local run_targets=($(_btarget_select_run_targets "${input}"))
-        if [ "${#run_targets[@]}" -eq 0 ]; then
-            _btarget_usage "unmatched run target."
-        fi
-        if [ "${#run_targets[@]}" -gt 1 ]; then
-            _btarget_usage "multiple run targets: ${run_targets[*]}"
-        fi
+    if [ -n "${env}" ]; then
+        local prefixed_env=$(_btarget_prefixed_env "${env}")
+        _btarget_run_target "${prefixed_env}" "${@}"
+        return
+    fi
 
-        shift
-        _btarget_run_target ${run_targets[0]} "${@}"
-        ;;
-    esac
+    _btarget_run_target "${@}"
 }
