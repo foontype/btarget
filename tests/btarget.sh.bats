@@ -42,7 +42,7 @@ setup() {
     [ "${output}" = "expected_invalid_env" ]
 }
 
-@test "_btarget_list_run_targets" {
+@test "_btarget_list_run_targets_for_dirs" {
     compgen() {
         case "${2}" in
         */target.sh) echo "path/to/def/target.sh path/to/bcd/target.sh";;
@@ -64,6 +64,21 @@ ijk
 jkl" ]
 }
 
+@test "_btarget_list_run_targets_for_shells" {
+    compgen() {
+        case "${2}" in
+        */example1.sh) echo "path/to/def/example1.sh";;
+        */example2.sh) echo "path/to/cde/example2.sh";;
+        esac
+    }
+
+    RUN_TARGET_SEARCH_SHELLS="example1.sh example2.sh"
+
+    run _btarget_list_run_targets
+
+    [ "${output}" = "example1
+example2" ]
+}
 
 @test "_btarget_list_run_target_dirs_only_available" {
     _btarget_list_run_target_dirs() {
@@ -79,23 +94,8 @@ z"
     [ "${output}" = "on-x" ]
 }
 
-@test "_btarget_list_run_targets_for_shells" {
-    _btarget_list_run_target_shells() {
-        echo "a
-b
-c"
-    }
 
-    RUN_TARGET_SEARCH_SHELLS="*"
-
-    run _btarget_list_run_targets
-
-    [ "${output}" = "a
-b
-c" ]
-}
- 
-@test "_btarget_list_run_targets_sorted" {
+@test "_btarget_list_run_targets_sorted_for_dirs" {
     _btarget_list_run_target_dirs() {
         echo "bcd
 cde
@@ -115,6 +115,22 @@ efg
 fgh" ]
 }
 
+@test "_btarget_list_run_targets_sorted_for_shells" {
+    _btarget_list_run_target_shells() {
+        echo "a
+b
+c"
+    }
+
+    RUN_TARGET_SEARCH_SHELLS="*"
+
+    run _btarget_list_run_targets_sorted
+
+    [ "${output}" = "a
+b
+c" ]
+}
+ 
 @test "_btarget_make_select_pattern" {
     local expects=(
         '"ab" "ab*"'
