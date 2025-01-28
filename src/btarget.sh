@@ -85,8 +85,10 @@ _btarget_list_run_target_dirs_only_available() {
 }
 
 _btarget_list_run_target_shells() {
-    for t in $(compgen -G "${RUN_TARGET_SEARCH_DIR}/${RUN_TARGET_SEARCH_SHELL}"); do
-        echo "$(basename "${t}" "${RUN_TARGET_SEARCH_SHELL_EXT}")"
+    for s in ${RUN_TARGET_SEARCH_SHELL}; do
+        for t in $(compgen -G "${RUN_TARGET_SEARCH_DIR}/${RUN_TARGET_SEARCH_SHELL}"); do
+            echo "$(basename "${t}" "${RUN_TARGET_SEARCH_SHELL_EXT}")"
+        done
     done
 }
 
