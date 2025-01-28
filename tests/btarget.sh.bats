@@ -64,9 +64,12 @@ ijk
 jkl" ]
 }
 
+
 @test "_btarget_list_run_target_dirs_only_available" {
     _btarget_list_run_target_dirs() {
-        echo "on-x on-y z"
+        echo "on-x
+on-y
+z"
     }
 
     RUN_TARGET_ENV="x"
@@ -76,7 +79,23 @@ jkl" ]
     [ "${output}" = "on-x" ]
 }
 
-@test "_btarget_list_run_target_dirs_only_available_sorted" {
+@test "_btarget_list_run_targets_for_shells" {
+    _btarget_list_run_target_shells() {
+        echo "a
+b
+c"
+    }
+
+    RUN_TARGET_SEARCH_SHELL="*"
+
+    run _btarget_list_run_targets
+
+    [ "${output}" = "a
+b
+c" ]
+}
+ 
+@test "_btarget_list_run_targets_sorted" {
     _btarget_list_run_target_dirs() {
         echo "bcd
 cde
