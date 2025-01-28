@@ -33,7 +33,7 @@ setup() {
     [ "${output}" = "unknown" ]
 }
 
-@test "_btarget_current_env_invalid_changed" {
+@test "_btarget_current_env_invalid_configured" {
     RUN_TARGET_ENV="InVaLiDEnV"
     RUN_TARGET_ENV_INVALID="expected_invalid_env"
 
