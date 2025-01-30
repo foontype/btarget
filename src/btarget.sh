@@ -110,7 +110,7 @@ _btarget_run_target_next_shell() {
         _btarget_error "no next shell"
     fi
 
-    bash ${next_shell} "${@}"
+    RUN_TARGET_ENV= bash ${next_shell} "${@}"
 }
 
 _btarget_run_target_dir() {
