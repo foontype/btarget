@@ -128,6 +128,15 @@ _btarget_run_target_dir() {
 _btarget_run_target() {
     local input="${1}"
 
+    # NOTE: auto-select by env, or consume first selector.
+    local env=$(_btarget_current_env)
+    if [ -n "${env}" ]; then
+        local prefixed_env=$(_btarget_prefixed_env "${env}")
+        input="${prefixed_env}"
+    elif [ ${#} -gt 0 ]; then
+        shift
+    fi
+
     if [ "${input}" = "" ]; then
         _btarget_usage "please specify run target."
     fi
