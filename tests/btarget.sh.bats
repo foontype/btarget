@@ -45,7 +45,6 @@ setup() {
 @test "_btarget_list_run_target_dirs" {
     compgen() {
         case "${2}" in
-        */target.sh) echo "path/to/def/target.sh path/to/bcd/target.sh";;
         */run.sh) echo "path/to/cde/run.sh path/to/abc/run.sh";;
         */task.sh) echo "path/to/ghi/run.sh path/to/hij/run.sh";;
         */workflow.sh) echo "path/to/ijk/run.sh path/to/jkl/run.sh";;
@@ -54,9 +53,7 @@ setup() {
 
     run _btarget_list_run_target_dirs
 
-    [ "${output}" = "def
-bcd
-cde
+    [ "${output}" = "cde
 abc
 ghi
 hij
