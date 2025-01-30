@@ -130,13 +130,13 @@ _btarget_run_target() {
 
     # TODO
     # NOTE: auto-select by env, or consume first selector.
-    #local env=$(_btarget_current_env)
-    #if [ -n "${env}" -a -z "${RUN_TARGET_SEARCH_SHELL}" ]; then
-    #    local prefixed_env=$(_btarget_prefixed_env "${env}")
-    #    input="${prefixed_env}"
-    #elif [ ${#} -gt 0 ]; then
-    #    shift
-    #fi
+    local env=$(_btarget_current_env)
+    if [ -n "${env}" -a -z "${RUN_TARGET_SEARCH_SHELL}" ]; then
+        local prefixed_env=$(_btarget_prefixed_env "${env}")
+        input="${prefixed_env}"
+    elif [ ${#} -gt 0 ]; then
+        shift
+    fi
 
     if [ "${input}" = "" ]; then
         _btarget_usage "please specify run target."
