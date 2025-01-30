@@ -3,7 +3,7 @@
 trap '[[ ${?} -eq 0 ]] && _btarget_bootstrap "${@}"' EXIT
 
 RUN_TARGET_SEARCH_DIR=${RUN_TARGET_SEARCH_DIR:-.}
-RUN_TARGET_NEXT_SHELLS=${RUN_TARGET_NEXT_SHELLS:-target.sh run.sh task.sh workflow.sh}
+RUN_TARGET_NEXT_SHELLS=${RUN_TARGET_NEXT_SHELLS:-run.sh task.sh workflow.sh}
 RUN_TARGET_DESC_FILENAME=${RUN_TARGET_DESC_FILENAME:-RUN_TARGET_DESC}
 RUN_TARGET_ENV=${RUN_TARGET_ENV:-}
 RUN_TARGET_ENV_PREFIX=${RUN_TARGET_ENV_PREFIX:-on-}
@@ -110,7 +110,7 @@ _btarget_run_target_next_shell() {
         _btarget_error "no next shell"
     fi
 
-    RUN_TARGET_ENV= bash ${next_shell} "${@}"
+    bash ${next_shell} "${@}"
 }
 
 _btarget_run_target_dir() {
