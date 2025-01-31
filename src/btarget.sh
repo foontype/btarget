@@ -9,6 +9,32 @@ RUN_TARGET_ENV=${RUN_TARGET_ENV:-}
 RUN_TARGET_ENV_PREFIX=${RUN_TARGET_ENV_PREFIX:-on-}
 RUN_TARGET_ENV_INVALID=${RUN_TARGET_ENV_INVALID:-unknown}
 
+
+declare -gA _btarget_colors=(
+    [black]="$(echo -e '\e[30m')"
+    [red]="$(echo -e '\e[31m')"
+    [green]="$(echo -e '\e[32m')"
+    [yellow]="$(echo -e '\e[33m')"
+    [blue]="$(echo -e '\e[34m')"
+    [purple]="$(echo -e '\e[35m')"
+    [cyan]="$(echo -e '\e[36m')"
+    [light_gray]="$(echo -e '\e[37m')"
+    [gray]="$(echo -e '\e[90m')"
+    [light_red]="$(echo -e '\e[91m')"
+    [light_green]="$(echo -e '\e[92m')"
+    [light_yellow]="$(echo -e '\e[93m')"
+    [light_blue]="$(echo -e '\e[94m')"
+    [light_purple]="$(echo -e '\e[95m')"
+    [light_cyan]="$(echo -e '\e[96m')"
+    [white]="$(echo -e '\e[97m')"
+    [reset]="$(echo -e '\e[0m')"
+)
+
+_btarget_colorize() {
+    echo "${_btarget_colors[$1]}${*:2}${_btarget_colors[reset]}"
+}
+
+
 _btarget_usage() {
     local error="${1}"
     local run_targets=($(_btarget_list_run_targets_sorted))
