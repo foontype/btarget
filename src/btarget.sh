@@ -43,7 +43,7 @@ _btarget_done() {
 
 _btarget_error() {
     local error="${1}"
-    _btarget_log_error "Error: ${error}"
+    _btarget_log_error "error: ${error}"
     exit 1
 }
 
