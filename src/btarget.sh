@@ -13,25 +13,38 @@ RUN_TARGET_ENV_INVALID=${RUN_TARGET_ENV_INVALID:-unknown}
 declare -gA _btarget_colors=(
     [black]="$(echo -e '\e[30m')"
     [red]="$(echo -e '\e[31m')"
-    [green]="$(echo -e '\e[32m')"
-    [yellow]="$(echo -e '\e[33m')"
-    [blue]="$(echo -e '\e[34m')"
-    [purple]="$(echo -e '\e[35m')"
     [cyan]="$(echo -e '\e[36m')"
-    [light_gray]="$(echo -e '\e[37m')"
     [gray]="$(echo -e '\e[90m')"
-    [light_red]="$(echo -e '\e[91m')"
-    [light_green]="$(echo -e '\e[92m')"
-    [light_yellow]="$(echo -e '\e[93m')"
-    [light_blue]="$(echo -e '\e[94m')"
-    [light_purple]="$(echo -e '\e[95m')"
-    [light_cyan]="$(echo -e '\e[96m')"
     [white]="$(echo -e '\e[97m')"
     [reset]="$(echo -e '\e[0m')"
 )
 
-_btarget_colorize() {
-    echo "${_btarget_colors[$1]}${*:2}${_btarget_colors[reset]}"
+_btarget_log() {
+    echo "${_btarget_colors[gray]}${RUN_TARGET_ENV:+(RUN_TARGET_ENV=}${RUN_TARGET_ENV:-}${RUN_TARGET_ENV:+) }${_btarget_colors[reset]}${*}"
+}
+
+_btarget_log_error() {
+    _btarget_log "${_btarget_colors[red]}${*}${_btarget_colors[reset]}"
+}
+
+_btarget_log_info() {
+    _btarget_log "${_btarget_colors[cyan]}${*}${_btarget_colors[reset]}"
+}
+
+_btarget_log_debug() {
+    _btarget_log "${_btarget_colors[gray]}${*}${_btarget_colors[reset]}"
+}
+
+_btarget_done() {
+    local message="${1}"
+    _btarget_log_debug "${message}"
+    exit 0
+}
+
+_btarget_error() {
+    local error="${1}"
+    _btarget_log_error "Error: ${error}"
+    exit 1
 }
 
 
@@ -43,25 +56,25 @@ _btarget_usage() {
         local max_length=$(_btarget_max_len "${run_targets[@]}")
         local example_target="${run_targets[0]}"
 
-        echo ""
-        echo "usage:"
-        echo "  ${0} <run target>"
-        echo ""
-        echo "  ex) ${0} ${example_target}"
+        _btarget_log ""
+        _btarget_log "usage:"
+        _btarget_log "  ${0} <run target>"
+        _btarget_log ""
+        _btarget_log "  ex) ${0} ${example_target}"
 
-        echo ""
-        echo "  run target can be abbreviated at each dash."
-        echo "  for instance, \"th-i-ap\" matches \"this-is-apple\"."
+        _btarget_log ""
+        _btarget_log "  run target can be abbreviated at each dash."
+        _btarget_log "  for instance, \"th-i-ap\" matches \"this-is-apple\"."
 
-        echo ""
-        echo "available run targets:"
+        _btarget_log ""
+        _btarget_log "available run targets:"
         for t in ${run_targets[*]}; do
             local desc=$(_btarget_get_desc "${t}")
             [ -z "${desc}" ] \
-                && echo "  * $(basename "${t}")" \
-                || printf "  * %-${max_length}s   # %s\n" "${t}" "${desc}"
+                && _btarget_log_info "  $(basename "${t}")" \
+                || printf "  %-${max_length}s   # %s\n" "${t}" "${desc}"
         done
-        echo ""
+        _btarget_log ""
     else
         error="no run targets found."
     fi
@@ -70,12 +83,6 @@ _btarget_usage() {
         _btarget_error "${error}"
     fi
 
-    exit 1
-}
-
-_btarget_error() {
-    local error="${1}"
-    echo "Error: ${error}"
     exit 1
 }
 
@@ -129,8 +136,9 @@ _btarget_select_run_targets() {
 
 _btarget_run_target_next_shell() {
     local next_shell="${1}"
+    local run_target_name="${2}"
 
-    shift
+    shift 2
 
     if [ -z "${next_shell}" ]; then
         _btarget_error "no next shell"
@@ -141,14 +149,15 @@ _btarget_run_target_next_shell() {
 
 _btarget_run_target_dir() {
     local run_target_dir="${1}"
+    local run_target_name="${2}"
 
-    shift
+    shift 2
 
     cd "${run_target_dir}"
-    echo "(in $(pwd))"
+    _btarget_log_debug "in $(pwd)"
 
     local next_shell=$(_btarget_get_next_shell)
-    _btarget_run_target_next_shell "${next_shell}" "${@}"
+    _btarget_run_target_next_shell "${next_shell}" "${run_target_name}" "${@}"
 }
 
 _btarget_run_target() {
@@ -175,7 +184,14 @@ _btarget_run_target() {
         _btarget_usage "multiple run targets: ${run_targets[*]}"
     fi
 
-    _btarget_run_target_dir ${run_targets[0]} "${@}"
+    local run_target_name=$(basename "${run_targets[0]}")
+    _btarget_run_target_dir "${run_targets[0]}" "${run_target_name}" "${@}"
+
+    if [ ${?} -eq 0 ]; then
+        _btarget_done "run target '${run_target_name}' finished (${?})"
+    else 
+        _btarget_error "run target '${run_target_name}' failed (${?})"
+    fi
 }
 
 _btarget_make_select_pattern() {
