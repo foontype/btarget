@@ -20,7 +20,7 @@ declare -gA _btarget_colors=(
 )
 
 _btarget_log() {
-    echo "${_btarget_colors[gray]}${RUN_TARGET_ENV:+(RUN_TARGET_ENV=}${RUN_TARGET_ENV:-}${RUN_TARGET_ENV:+) }${_btarget_colors[reset]}${*}"
+    echo "${_btarget_colors[gray]}...${_btarget_colors[reset]} ${*}"
 }
 
 _btarget_log_error() {
@@ -248,5 +248,9 @@ _btarget_max_len() {
 }
 
 _btarget_bootstrap() {
+    if [ -n "${RUN_TARGET_ENV}" ]; then
+        _btarget_log_debug "RUN_TARGET_ENV='${RUN_TARGET_ENV}'"
+    fi
+
     _btarget_run_target "${@}"
 }
