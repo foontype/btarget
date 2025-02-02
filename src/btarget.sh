@@ -20,7 +20,7 @@ declare -gA _btarget_colors=(
 )
 
 _btarget_log() {
-    echo "${_btarget_colors[gray]}...${_btarget_colors[reset]} ${*}"
+    echo "${_btarget_colors[gray]}${_btarget_colors[reset]}${*}"
 }
 
 _btarget_log_error() {
