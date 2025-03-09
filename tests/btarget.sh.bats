@@ -17,31 +17,6 @@ setup() {
     [ "$result" = "3" ]
 }
 
-@test "_btarget_current_env" {
-    RUN_TARGET_ENV="x"
-
-    run _btarget_current_env
-
-    [ "${output}" = "x" ]
-}
-
-@test "_btarget_current_env_invalid" {
-    RUN_TARGET_ENV="InVaLiDEnV"
-
-    run _btarget_current_env
-
-    [ "${output}" = "unknown" ]
-}
-
-@test "_btarget_current_env_invalid_configured" {
-    RUN_TARGET_ENV="InVaLiDEnV"
-    RUN_TARGET_ENV_INVALID="expected_invalid_env"
-
-    run _btarget_current_env
-
-    [ "${output}" = "expected_invalid_env" ]
-}
-
 @test "_btarget_list_run_target_dirs" {
     compgen() {
         case "${2}" in
@@ -54,21 +29,6 @@ setup() {
     [ "${output}" = "ghi
 hij" ]
 }
-
-@test "_btarget_list_run_target_dirs_only_available" {
-    _btarget_list_run_target_dirs() {
-        echo "on-x
-on-y
-z"
-    }
-
-    RUN_TARGET_ENV="x"
-
-    run _btarget_list_run_target_dirs_only_available
-
-    [ "${output}" = "on-x" ]
-}
-
 
 @test "_btarget_list_run_targets_sorted" {
     _btarget_list_run_target_dirs() {

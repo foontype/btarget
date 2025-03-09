@@ -95,29 +95,8 @@ _btarget_list_run_target_dirs() {
     done
 }
 
-_btarget_list_run_target_dirs_only_available() {
-    local run_targets=$(_btarget_list_run_target_dirs)
-    local env=$(_btarget_current_env)
-
-    if [ -z "${env}" ]; then
-        local prefixed_env=$(_btarget_prefixed_env)
-        for t in ${run_targets}; do
-            if [ ! "${t}" = "${prefixed_env}"* ]; then
-                echo "${t}"
-            fi
-        done
-    else
-        local prefixed_env=$(_btarget_prefixed_env "${env}")
-        for t in ${run_targets}; do
-            if [ "${t}" = "${prefixed_env}" ]; then
-                echo "${t}"
-            fi
-        done
-    fi
-}
-
 _btarget_list_run_targets_sorted() {
-    _btarget_list_run_target_dirs_only_available | sort
+    _btarget_list_run_target_dirs | sort
 }
 
 _btarget_select_run_targets() {
@@ -164,16 +143,19 @@ _btarget_run_target_dir() {
 _btarget_run_target() {
     local input="${1}"
 
-    # NOTE: auto-select by env, or consume first selector.
-    local env=$(_btarget_current_env)
-    if [ -n "${env}" ]; then
-        local prefixed_env=$(_btarget_prefixed_env "${env}")
-        input="${prefixed_env}"
-    elif [ ${#} -gt 0 ]; then
+    if [ -n "${input}" ]; then
         shift
     fi
 
-    if [ "${input}" = "" ]; then
+    # auto select when run target is specified
+    if [ -n "${RUN_TARGET}" ]; then
+        local auto_targets=($(_btarget_list_run_targets_sorted))
+        if [ "${#auto_targets[@]}" -eq 1 ]; then
+            input="${auto_targets[0]}"
+        fi
+    fi
+
+    if [ -z "${input}" ]; then
         _btarget_usage "please specify run target."
     fi
 
@@ -207,25 +189,8 @@ _btarget_next_shells() {
 
     local shell_name=$(basename "${RUN_TARGET_NEXT_SHELL}" "${RUN_TARGET_NEXT_SHELL_EXT}")
     for t in ${RUN_TARGET}; do
-        echo "${RUN_TARGET_NEXT_SHELL}.${t}${RUN_TARGET_NEXT_SHELL_EXT}"
+        echo "${shell_name}.${t}${RUN_TARGET_NEXT_SHELL_EXT}"
     done
-}
-
-_btarget_current_env() {
-    local env=$(echo "${RUN_TARGET_ENV}" | grep '^[a-z-][a-z0-9-]*$')
-
-    if [ ! "${env}" = "${RUN_TARGET_ENV}" ]; then
-        echo "${RUN_TARGET_ENV_INVALID}"
-        return
-    fi
-
-    echo "${env}"
-}
-
-_btarget_prefixed_env() {
-    local env="${1:-}"
-
-    echo "${RUN_TARGET_ENV_PREFIX}${env}"
 }
 
 _btarget_get_next_shell() {
