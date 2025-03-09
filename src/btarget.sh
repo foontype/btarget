@@ -7,9 +7,6 @@ RUN_TARGET_NEXT_SHELL=${RUN_TARGET_NEXT_SHELL:-task.sh}
 RUN_TARGET_NEXT_SHELL_EXT=${RUN_TARGET_NEXT_SHELL_EXT:-.sh}
 RUN_TARGET_DESC_FILENAME=${RUN_TARGET_DESC_FILENAME:-RUN_TARGET_DESC}
 RUN_TARGET_ENV=${RUN_TARGET_ENV:-}
-RUN_TARGET_ENV_PREFIX=${RUN_TARGET_ENV_PREFIX:-on-}
-RUN_TARGET_ENV_INVALID=${RUN_TARGET_ENV_INVALID:-unknown}
-
 
 declare -gA _btarget_colors=(
     [black]="$(echo -e '\e[30m')"
@@ -142,17 +139,20 @@ _btarget_run_target_dir() {
 
 _btarget_run_target() {
     local input="${1}"
-
-    if [ -n "${input}" ]; then
-        shift
-    fi
+    local auto_input=""
 
     # auto select when run target is specified
     if [ -n "${RUN_TARGET}" ]; then
         local auto_targets=($(_btarget_list_run_targets_sorted))
         if [ "${#auto_targets[@]}" -eq 1 ]; then
-            input="${auto_targets[0]}"
+            auto_input="${auto_targets[0]}"
         fi
+    fi
+
+    if [ -n "${auto_input}" ]; then
+        input="${auto_input}"
+    elif [ ${#} -gt 0 ]; then
+        shift
     fi
 
     if [ -z "${input}" ]; then
