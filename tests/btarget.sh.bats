@@ -45,20 +45,14 @@ setup() {
 @test "_btarget_list_run_target_dirs" {
     compgen() {
         case "${2}" in
-        */run.sh) echo "path/to/cde/run.sh path/to/abc/run.sh";;
-        */task.sh) echo "path/to/ghi/run.sh path/to/hij/run.sh";;
-        */workflow.sh) echo "path/to/ijk/run.sh path/to/jkl/run.sh";;
+        */task.sh) echo "path/to/ghi/task.sh path/to/hij/task.sh";;
         esac
     }
 
     run _btarget_list_run_target_dirs
 
-    [ "${output}" = "cde
-abc
-ghi
-hij
-ijk
-jkl" ]
+    [ "${output}" = "ghi
+hij" ]
 }
 
 @test "_btarget_list_run_target_dirs_only_available" {
