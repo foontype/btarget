@@ -3,7 +3,7 @@
 trap '[[ ${?} -eq 0 ]] && _btarget_bootstrap "${@}"' EXIT
 
 RUN_TARGET_SEARCH_DIR=${RUN_TARGET_SEARCH_DIR:-.}
-RUN_TARGET_NEXT_SHELLS=${RUN_TARGET_NEXT_SHELLS:-task.sh}
+RUN_TARGET_NEXT_SHELL=${RUN_TARGET_NEXT_SHELL:-task.sh}
 RUN_TARGET_DESC_FILENAME=${RUN_TARGET_DESC_FILENAME:-RUN_TARGET_DESC}
 RUN_TARGET_ENV=${RUN_TARGET_ENV:-}
 RUN_TARGET_ENV_PREFIX=${RUN_TARGET_ENV_PREFIX:-on-}
@@ -87,7 +87,7 @@ _btarget_usage() {
 }
 
 _btarget_list_run_target_dirs() {
-    for s in ${RUN_TARGET_NEXT_SHELLS}; do
+    for s in $(_btarget_next_shells); do
         for t in $(compgen -G "${RUN_TARGET_SEARCH_DIR}/*/${s}"); do
             echo "$(basename $(dirname ${t}))"
         done
@@ -198,6 +198,10 @@ _btarget_make_select_pattern() {
     echo "${1}*" | sed 's/-/*-/g'
 }
 
+_btarget_next_shells() {
+    echo "${RUN_TARGET_NEXT_SHELL}"
+}
+
 _btarget_current_env() {
     local env=$(echo "${RUN_TARGET_ENV}" | grep '^[a-z-][a-z0-9-]*$')
 
@@ -216,7 +220,7 @@ _btarget_prefixed_env() {
 }
 
 _btarget_get_next_shell() {
-    for s in ${RUN_TARGET_NEXT_SHELLS}; do
+    for s in $(_btarget_next_shells); do
         if [ -f "./${s}" ]; then
             echo "./${s}"
             return
