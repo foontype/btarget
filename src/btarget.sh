@@ -96,8 +96,8 @@ _btarget_list_run_target_dirs() {
 }
 
 _btarget_list_run_target_dirs_only_available() {
-    local env=$(_btarget_current_env)
     local run_targets=$(_btarget_list_run_target_dirs)
+    local env=$(_btarget_current_env)
 
     if [ -z "${env}" ]; then
         local prefixed_env=$(_btarget_prefixed_env)
