@@ -200,7 +200,15 @@ _btarget_make_select_pattern() {
 }
 
 _btarget_next_shells() {
-    echo "${RUN_TARGET_NEXT_SHELL}"
+    if [ -z "${RUN_TARGET}" ]; then
+        echo "${RUN_TARGET_NEXT_SHELL}"
+        return
+    fi
+
+    local shell_name=$(basename "${RUN_TARGET_NEXT_SHELL}" "${RUN_TARGET_NEXT_SHELL_EXT}")
+    for t in ${RUN_TARGET}; do
+        echo "${RUN_TARGET_NEXT_SHELL}.${t}${RUN_TARGET_NEXT_SHELL_EXT}"
+    done
 }
 
 _btarget_current_env() {
