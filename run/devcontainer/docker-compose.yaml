@@ -2,7 +2,7 @@ services:
   workspace:
     build:
       context: ../..
-      dockerfile: ./run/devcontainer/Dockerfile
+      dockerfile: ./run/devcontainer/workspace.Dockerfile
       args:
         - CONTAINER_UID=${CONTAINER_UID:?}
         - CONTAINER_GID=${CONTAINER_GID:?}

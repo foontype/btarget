@@ -4,7 +4,6 @@ trap '[[ ${?} -eq 0 ]] && _btarget_bootstrap "${@}"' EXIT
 
 RUN_TARGET_SEARCH_DIR=${RUN_TARGET_SEARCH_DIR:-.}
 RUN_TARGET_NEXT_SHELL=${RUN_TARGET_NEXT_SHELL:-task.sh}
-RUN_TARGET_NEXT_SHELL_EXT=${RUN_TARGET_NEXT_SHELL_EXT:-.sh}
 RUN_TARGET_DESC_FILENAME=${RUN_TARGET_DESC_FILENAME:-RUN_TARGET_DESC}
 RUN_TARGET_ENV=${RUN_TARGET_ENV:-}
 
@@ -142,7 +141,7 @@ _btarget_run_target() {
     local auto_input=""
 
     # auto select when run target is specified
-    if [ -n "${RUN_TARGET}" ]; then
+    if [ -n "${RUN_TARGET_ENV}" ]; then
         local auto_targets=($(_btarget_list_run_targets_sorted))
         if [ "${#auto_targets[@]}" -eq 1 ]; then
             auto_input="${auto_targets[0]}"
@@ -182,14 +181,13 @@ _btarget_make_select_pattern() {
 }
 
 _btarget_next_shells() {
-    if [ -z "${RUN_TARGET}" ]; then
+    if [ -z "${RUN_TARGET_ENV}" ]; then
         echo "${RUN_TARGET_NEXT_SHELL}"
         return
     fi
 
-    local shell_name=$(basename "${RUN_TARGET_NEXT_SHELL}" "${RUN_TARGET_NEXT_SHELL_EXT}")
-    for t in ${RUN_TARGET}; do
-        echo "${shell_name}.${t}${RUN_TARGET_NEXT_SHELL_EXT}"
+    for t in ${RUN_TARGET_ENV}; do
+        echo "${t}.${RUN_TARGET_NEXT_SHELL}"
     done
 }
 
