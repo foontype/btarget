@@ -6,6 +6,7 @@ RUN_TARGET_SEARCH_DIR=${RUN_TARGET_SEARCH_DIR:-.}
 RUN_TARGET_NEXT_SHELL=${RUN_TARGET_NEXT_SHELL:-task.sh}
 RUN_TARGET_NEXT_SHELL_EXT=${RUN_TARGET_NEXT_SHELL_EXT:-.sh}
 RUN_TARGET_DESC_FILENAME=${RUN_TARGET_DESC_FILENAME:-RUN_TARGET_DESC}
+RUN_TARGET_SELECT=${RUN_TARGET_SELECT:-}
 RUN_TARGET_ENV=${RUN_TARGET_ENV:-}
 
 declare -gA _btarget_colors=(
@@ -142,7 +143,9 @@ _btarget_run_target() {
     local auto_input=""
 
     # auto select when run target is specified
-    if [ -n "${RUN_TARGET_ENV}" ]; then
+    if [ -n "${RUN_TARGET_SELECT}" ]; then
+        auto_input="${RUN_TARGET_SELECT}"
+    elif [ -n "${RUN_TARGET_ENV}" ]; then
         local auto_targets=($(_btarget_list_run_targets_sorted))
         if [ "${#auto_targets[@]}" -eq 1 ]; then
             auto_input="${auto_targets[0]}"
@@ -152,7 +155,7 @@ _btarget_run_target() {
     if [ -n "${auto_input}" ]; then
         input="${auto_input}"
     elif [ ${#} -gt 0 ]; then
-        shift
+        shift # NOTE: consume input
     fi
 
     if [ -z "${input}" ]; then
@@ -172,7 +175,7 @@ _btarget_run_target() {
 
     if [ ${?} -eq 0 ]; then
         _btarget_done "run target '${run_target_name}' finished (${?})"
-    else 
+    else
         _btarget_error "run target '${run_target_name}' failed (${?})"
     fi
 }
